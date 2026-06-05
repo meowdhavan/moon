@@ -47,7 +47,7 @@ func (p *parser) fillFlagMap(c *Command) {
 func (p *parser) parseFlags(c *Command) {
 	p.fillFlagMap(c)
 
-	for p.tokenIdx < len(p.tokens) {
+	for ; p.tokenIdx < len(p.tokens); p.tokenIdx++ {
 		token := p.tokens[p.tokenIdx]
 
 		if isFlag(token) {
@@ -61,6 +61,7 @@ func (p *parser) parseFlags(c *Command) {
 				if p.tokenIdx+1 < len(p.tokens) && !isFlag(p.tokens[p.tokenIdx+1]) {
 					f.setValue(p.tokens[p.tokenIdx+1])
 					f.isValueSet = true
+					p.tokenIdx++
 				} else {
 					// Error: No value supplied for flag
 				}
