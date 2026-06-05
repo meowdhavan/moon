@@ -50,7 +50,7 @@ func (p *parser) parseFlags(c *Command) {
 	for ; p.tokenIdx < len(p.tokens); p.tokenIdx++ {
 		token := p.tokens[p.tokenIdx]
 
-		if isFlag(token) {
+		if isLongFlag(token) {
 			f, found := p.flagMap[token]
 			if !found {
 				// Warning: Unrecognized flag
@@ -68,6 +68,34 @@ func (p *parser) parseFlags(c *Command) {
 			} else {
 				f.setValue("true")
 				f.isValueSet = true
+			}
+		} else if isShortFlag(token) {
+			for i, c := range token[1:] {
+				f, found := p.flagMap["-"+string(c)]
+				if !found {
+					// Warning: Unrecognized flag
+					continue
+				}
+
+				if f.requiresVal {
+					if i + 2 < len(token) {
+						f.setValue(token[i+2:])
+						f.isValueSet = true
+					} else {
+						if p.tokenIdx+1 < len(p.tokens) && !isFlag(p.tokens[p.tokenIdx+1]) {
+							f.setValue(p.tokens[p.tokenIdx+1])
+							f.isValueSet = true
+							p.tokenIdx++
+						} else {
+							// Error: No value supplied for flag
+						}
+					}
+
+					break
+				} else {
+					f.setValue("true")
+					f.isValueSet = true
+				}
 			}
 		} else {
 			for _, f := range c.flags {

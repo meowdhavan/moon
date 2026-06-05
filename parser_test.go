@@ -24,3 +24,24 @@ func TestLongStringFlagParse(t *testing.T) {
 		t.Errorf("target2=%s; want %s", target2, "target_value_2")
 	}
 }
+
+func TestShortStringFlagParse(t *testing.T) {
+	var targetA string
+	var targetB string
+
+	c := Command{}
+	c.AddStringFlag(&targetA, []string{}, "a", "", false)
+	c.AddStringFlag(&targetB, []string{}, "b", "", false)
+
+	p := newParser([]string{"app", "-a", "target_value_1", "-btarget_value_2"})
+
+	p.parseFlags(&c)
+
+	if targetA != "target_value_1" {
+		t.Errorf("targetA=%s; want %s", targetA, "target_value_1")
+	}
+
+	if targetB != "target_value_2" {
+		t.Errorf("targetB=%s; want %s", targetB, "target_value_2")
+	}
+}
