@@ -1,6 +1,7 @@
 package mon
 
 import (
+	"errors"
 	"strings"
 )
 
@@ -44,6 +45,31 @@ func (p *parser) fillFlagMap(c *Command) {
 	}
 }
 
+func (p *parser) setValue(f *flag, val string) error {
+	err := f.setValue(val)
+	f.isValueSet = true // We set it to true even if there is an attempt to set an invalid value
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *parser) setNextTokenAsValue(f *flag) error {
+	if p.tokenIdx+1 < len(p.tokens) && !isFlag(p.tokens[p.tokenIdx+1]) {
+		err := p.setValue(f, p.tokens[p.tokenIdx+1])
+		p.tokenIdx++
+
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("No value supplied for flag")
+	}
+
+	return nil
+}
+
 func (p *parser) parseFlags(c *Command) {
 	p.fillFlagMap(c)
 
@@ -58,20 +84,19 @@ func (p *parser) parseFlags(c *Command) {
 			}
 
 			if f.requiresVal {
-				if p.tokenIdx+1 < len(p.tokens) && !isFlag(p.tokens[p.tokenIdx+1]) {
-					f.setValue(p.tokens[p.tokenIdx+1])
-					f.isValueSet = true
-					p.tokenIdx++
-				} else {
-					// Error: No value supplied for flag
+				err := p.setNextTokenAsValue(f)
+				if err != nil {
+					c.errors = append(c.errors, err)
 				}
 			} else {
-				f.setValue("true")
-				f.isValueSet = true
+				err := p.setValue(f, "true")
+				if err != nil {
+					c.errors = append(c.errors, err)
+				}
 			}
 		} else if isShortFlag(token) {
-			for i, c := range token[1:] {
-				f, found := p.flagMap["-"+string(c)]
+			for i, ch := range token[1:] {
+				f, found := p.flagMap["-"+string(ch)]
 				if !found {
 					// Warning: Unrecognized flag
 					continue
@@ -79,22 +104,23 @@ func (p *parser) parseFlags(c *Command) {
 
 				if f.requiresVal {
 					if i + 2 < len(token) {
-						f.setValue(token[i+2:])
-						f.isValueSet = true
+						err := p.setValue(f, token[i+2:])
+						if err != nil {
+							c.errors = append(c.errors, err)
+						}
 					} else {
-						if p.tokenIdx+1 < len(p.tokens) && !isFlag(p.tokens[p.tokenIdx+1]) {
-							f.setValue(p.tokens[p.tokenIdx+1])
-							f.isValueSet = true
-							p.tokenIdx++
-						} else {
-							// Error: No value supplied for flag
+						err := p.setNextTokenAsValue(f)
+						if err != nil {
+							c.errors = append(c.errors, err)
 						}
 					}
 
 					break
 				} else {
-					f.setValue("true")
-					f.isValueSet = true
+					err := p.setValue(f, "true")
+					if err != nil {
+						c.errors = append(c.errors, err)
+					}
 				}
 			}
 		} else {
