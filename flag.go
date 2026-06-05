@@ -10,7 +10,7 @@ type flag struct {
 	isValueSet  bool
 }
 
-func (c *Command) AddStringFlag(target *string, longNames []string, shortName string, about string, isRequired bool, setValue bool) {
+func (c *Command) AddStringFlag(target *string, longNames []string, shortName string, about string, isRequired bool) {
 	c.flags = append(c.flags, flag{
 		longNames: longNames,
 		shortName: shortName,
