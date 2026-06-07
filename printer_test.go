@@ -29,8 +29,20 @@ func TestIntroLinePrint(t *testing.T) {
 	w := CustomWriter{}
 
 	p := NewPrinter(&w)
+	p.Focus = func(s string) string {
+		return s
+	}
+	p.Heading = func(s string) string {
+		return s
+	}
 
 	p.printIntroLine(&c)
 
-	t.Logf("Intro Line: '%s'", w.String())
+	got := w.String()
+	want := `app - short about
+`
+
+	if got != want {
+		t.Errorf("Intro Line: '%s'; want = '%s'", got, want)
+	}
 }
