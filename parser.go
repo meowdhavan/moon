@@ -21,6 +21,7 @@ func newParser(rootCmd *Command, tokens []string) parser {
 	return parser{
 		currentCmd: rootCmd,
 		flagMap:  make(map[string]*flag),
+		subcommandsMap: make(map[string]*Command),
 		tokens: tokens,
 		tokenIdx: 1,
 		requiredPosArgIdx: 0,

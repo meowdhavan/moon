@@ -139,7 +139,7 @@ func (p *printer) printSubcommands(c *Command) {
 	tw := tabwriter.NewWriter(p.w, 5, 0, 2, ' ', 0)
 
 	for _, s := range c.subcommands {
-		fmt.Fprintf(tw, "    %s", p.Focus("--"+s.Names[0]))
+		fmt.Fprintf(tw, "    %s", p.Focus(s.Names[0]))
 
 		fmt.Fprintf(tw, "\t%s", s.AboutShort)
 	}
