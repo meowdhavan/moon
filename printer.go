@@ -10,16 +10,11 @@ import (
 )
 
 type Printer interface {
-	newLine() 
+	newLine()
 	printError(*parser) 
 	printWarning(*parser) 
 	printHelp(*Command) 
-	printIntroLine(*Command) 
 	printFullUsage(*Command) 
-	printAboutLong(*Command) 
-	printUsage(*Command) 
-	printSubcommands(*Command) 
-	printFlags(*Command) 
 }
 
 type defaultPrinter struct {
@@ -32,20 +27,12 @@ func newDefaultPrinter(w io.Writer) defaultPrinter {
 	return defaultPrinter{
 		w: w,
 		Heading: func(s string) string {
-			return underlineText(s)
+			return fmt.Sprintf("\x1b[4m%s\x1b[24m", s)
 		},
 		Focus: func(s string) string {
 			return s
 		},
 	}
-}
-
-func boldText(s string) string {
-	return fmt.Sprintf("\033[1m%s\033[0m", s)
-}
-
-func underlineText(s string) string {
-	return fmt.Sprintf("\x1b[4m%s\x1b[24m", s)
 }
 
 func (p *defaultPrinter) newLine() {
