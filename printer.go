@@ -33,31 +33,11 @@ func underlineText(s string) string {
 	return fmt.Sprintf("\x1b[4m%s\x1b[24m", s)
 }
 
-func (p *printer) printError(parser *parser) {
-	for _, e := range parser.errors {
-		fmt.Fprintf(p.w, "    - %s\n", e.Error())
-	}
-}
-
-func (p *printer) printWarning(parser *parser) {
-	for _, e := range parser.warnings {
-		fmt.Fprintf(p.w, "    - %s\n", e.Error())
-	}
-}
-
-func (p *printer) printHelp(c *Command) {
-	p.printIntroLine(c)
-
-	if c.AboutLong != "" {
-		fmt.Fprintln(p.w)
-		p.printAboutLong(c)
-	}
-
+func (p *printer) newLine() {
 	fmt.Fprintln(p.w)
-	p.printFullUsage(c)
 }
 
-func (p *printer) printFullError(parser *parser) {
+func (p *printer) printError(parser *parser) {
 	if len(parser.errors) == 0 {
 		return
 	}
@@ -68,11 +48,12 @@ func (p *printer) printFullError(parser *parser) {
 		fmt.Fprintf(p.w, "%s\n", p.Heading("Errors (" + strconv.Itoa(len(parser.errors)) + "):"))
 	}
 
-	p.printError(parser)
-	fmt.Fprintln(p.w)
+	for _, e := range parser.errors {
+		fmt.Fprintf(p.w, "    - %s\n", e.Error())
+	}
 }
 
-func (p *printer) printFullWarning(parser *parser) {
+func (p *printer) printWarning(parser *parser) {
 	if len(parser.warnings) == 0 {
 		return
 	}
@@ -83,25 +64,17 @@ func (p *printer) printFullWarning(parser *parser) {
 		fmt.Fprintf(p.w, "%s\n", p.Heading("Warnings (" + strconv.Itoa(len(parser.warnings)) + "):"))
 	}
 
-	p.printWarning(parser)
-	fmt.Fprintln(p.w)
+	for _, e := range parser.warnings {
+		fmt.Fprintf(p.w, "    - %s\n", e.Error())
+	}
 }
 
-func (p *printer) printFullUsage(c *Command) {
-	fmt.Fprintf(p.w, "%s ", p.Heading("Usage:"))
-	p.printUsage(c)
-
-	if len(c.subcommands) > 0 {
-		fmt.Fprintln(p.w)
-		fmt.Fprintln(p.w, p.Heading("Commands:"))
-		p.printSubcommands(c)
-	}
-
-	if len(c.flags) > 0 {
-		fmt.Fprintln(p.w)
-		fmt.Fprintln(p.w, p.Heading("Flags:"))
-		p.printFlags(c)
-	}
+func (p *printer) printHelp(c *Command) {
+	p.printIntroLine(c)
+	p.newLine()
+	p.printAboutLong(c)
+	p.newLine()
+	p.printFullUsage(c)
 }
 
 func (p *printer) printIntroLine(c *Command) {
@@ -114,11 +87,27 @@ func (p *printer) printIntroLine(c *Command) {
 	fmt.Fprintln(p.w)
 }
 
+func (p *printer) printFullUsage(c *Command) {
+	p.printUsage(c)
+	p.newLine()
+	p.printSubcommands(c)
+	p.newLine()
+	p.printFlags(c)
+}
+
 func (p *printer) printAboutLong(c *Command) {
+	if c.AboutLong == "" {
+		return
+	}
+
 	fmt.Fprintln(p.w, c.AboutLong)
 }
 
 func (p *printer) printUsage(c *Command) {
+	fmt.Fprintln(p.w, p.Heading("Usage:"))
+
+	fmt.Fprint(p.w, "    ")
+
 	fmt.Fprintf(p.w, "%s", c.Names[0])
 
 	if len(c.flags) > 0 {
@@ -136,6 +125,12 @@ func (p *printer) printUsage(c *Command) {
 }
 
 func (p *printer) printSubcommands(c *Command) {
+	if len(c.subcommands) == 0 {
+		return
+	}
+
+	fmt.Fprintln(p.w, p.Heading("Commands:"))
+
 	tw := tabwriter.NewWriter(p.w, 5, 0, 2, ' ', 0)
 
 	for _, s := range c.subcommands {
@@ -150,6 +145,12 @@ func (p *printer) printSubcommands(c *Command) {
 }
 
 func (p *printer) printFlags(c *Command) {
+	if len(c.flags) == 0 {
+		return
+	}
+
+	fmt.Fprintln(p.w, p.Heading("Flags:"))
+
 	tw := tabwriter.NewWriter(p.w, 5, 0, 2, ' ', 0)
 
 	for _, f := range c.flags {

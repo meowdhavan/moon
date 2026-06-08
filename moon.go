@@ -19,8 +19,15 @@ func Execute(rootCmd *Command) {
 		os.Exit(0)
 	}
 
-	printer.printFullError(&parser)
-	printer.printFullWarning(&parser)
+	printer.printError(&parser)
+	if len(parser.errors) > 0 {
+		printer.newLine()
+	}
+
+	printer.printWarning(&parser)
+	if len(parser.warnings) > 0 {
+		printer.newLine()
+	}
 
 	if len(parser.errors) > 0 {
 		printer.printFullUsage(cmd)
