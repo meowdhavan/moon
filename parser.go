@@ -10,6 +10,8 @@ type parser struct {
 	flagMap  map[string]*flag
 	tokens   []string
 	tokenIdx int
+	requiredPosArgIdx int
+	optionalPosArgIdx int
 	errors []error
 	warnings []error
 }
@@ -20,6 +22,8 @@ func newParser(rootCmd *Command, tokens []string) parser {
 		flagMap:  make(map[string]*flag),
 		tokens: tokens,
 		tokenIdx: 1,
+		requiredPosArgIdx: 0,
+		optionalPosArgIdx: 0,
 		errors: make([]error, 0),
 		warnings: make([]error, 0),
 	}
@@ -130,14 +134,40 @@ func (p *parser) parseFlags() {
 				}
 			}
 		} else {
-			s, found := p.currentCmd.subcommands[token]
-			if !found {
-				p.warnings = append(p.warnings, errors.New("Unrecognized subcommand: " + token))
-				continue
-			}
+			if len(p.currentCmd.subcommands) > 0 {
+				s, found := p.currentCmd.subcommands[token]
+				if !found {
+					p.warnings = append(p.warnings, errors.New("Unrecognized subcommand: " + token))
+					continue
+				}
 
-			p.currentCmd = s
-			p.fillFlagMap()
+				p.currentCmd = s
+				p.fillFlagMap()
+			} else {
+				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs) {
+					a := p.currentCmd.requiredPosArgs[p.requiredPosArgIdx]
+					err := a.setValue(token)
+					if err != nil {
+						// Error
+					}
+
+					p.requiredPosArgIdx++
+				} else if p.optionalPosArgIdx < len(p.currentCmd.optionalPosArgs) {
+					a := p.currentCmd.optionalPosArgs[p.optionalPosArgIdx]
+					err := a.setValue(token)
+					if err != nil {
+						// Error
+					}
+
+					p.optionalPosArgIdx++
+				} else {
+					v := p.currentCmd.varLenArg
+					if v == nil {
+						// Warning: Unrecognized argument
+					}
+					v.addValue(token)
+				}
+			}
 		}
 	}
 

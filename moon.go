@@ -8,10 +8,12 @@ type Command struct {
 	AboutLong  string
 	Run        func() error
 
-	subcommands map[string]*Command
-	flags       []flag
-	posArgs     []posArg
-	errors      []error
+	subcommands     map[string]*Command
+	flags           []flag
+	requiredPosArgs []posArg
+	optionalPosArgs []posArg
+	varLenArg       *varLenArg
+	errors          []error
 
 	parent *Command
 }

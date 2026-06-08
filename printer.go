@@ -80,9 +80,8 @@ func (p *printer) printUsage(c *Command) {
 
 	if len(c.subcommands) > 0 {
 		fmt.Fprint(p.w, " <COMMAND>")
-	} else if len(c.posArgs) > 0 {
+	} else {
 		fmt.Fprint(p.w, " ")
-
 		// TODO
 	}
 

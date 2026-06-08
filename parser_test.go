@@ -43,3 +43,23 @@ func TestShortStringFlagParse(t *testing.T) {
 		t.Errorf("targetB=%s; want %s", targetB, "target_value_2")
 	}
 }
+
+func TestStringPosArgParse(t *testing.T) {
+	var targetA string
+	var targetB string
+
+	c := Command{}
+	c.AddStringPosArg(&targetA, "a", "", false)
+	c.AddStringPosArg(&targetB, "b", "", false)
+
+	p := newParser(&c, []string{"app", "target_value_1", "target_value_2"})
+	p.parseFlags()
+
+	if targetA != "target_value_1" {
+		t.Errorf("targetA=%s; want %s", targetA, "target_value_1")
+	}
+
+	if targetB != "target_value_2" {
+		t.Errorf("targetB=%s; want %s", targetB, "target_value_2")
+	}
+}
