@@ -16,16 +16,16 @@ func TestLongStringFlagParse(t *testing.T) {
 	p := newParser(&c, []string{"app", "--test-flag-a", "target_value_1", "--test-flag-b", "target_value_2"})
 	p.parseFlags()
 
-	var gotString string
+	var wantString string
 
-	gotString = "target_value_1"
-	if targetA != gotString {
-		t.Errorf("targetA mismatch; got=%s, want %s", targetA, gotString)
+	wantString = "target_value_1"
+	if targetA != wantString {
+		t.Errorf("targetA mismatch; got=%s, want %s", targetA, wantString)
 	}
 
-	gotString = "target_value_2"
-	if targetB != gotString {
-		t.Errorf("targetB mismatch; got=%s, want %s", targetB, gotString)
+	wantString = "target_value_2"
+	if targetB != wantString {
+		t.Errorf("targetB mismatch; got=%s, want %s", targetB, wantString)
 	}
 }
 
@@ -40,16 +40,16 @@ func TestShortStringFlagParse(t *testing.T) {
 	p := newParser(&c, []string{"app", "-a", "target_value_1", "-btarget_value_2"})
 	p.parseFlags()
 
-	var gotString string
+	var wantString string
 
-	gotString = "target_value_1"
-	if targetA != gotString {
-		t.Errorf("targetA mismatch; got=%s, want %s", targetA, gotString)
+	wantString = "target_value_1"
+	if targetA != wantString {
+		t.Errorf("targetA mismatch; got=%s, want %s", targetA, wantString)
 	}
 
-	gotString = "target_value_2"
-	if targetB != gotString {
-		t.Errorf("targetB mismatch; got=%s, want %s", targetB, gotString)
+	wantString = "target_value_2"
+	if targetB != wantString {
+		t.Errorf("targetB mismatch; got=%s, want %s", targetB, wantString)
 	}
 }
 
@@ -64,16 +64,16 @@ func TestStringPosArgParse(t *testing.T) {
 	p := newParser(&c, []string{"app", "target_value_1", "target_value_2"})
 	p.parseFlags()
 
-	var gotString string
+	var wantString string
 
-	gotString = "target_value_1"
-	if targetA != gotString {
-		t.Errorf("targetA mismatch; got=%s, want %s", targetA, gotString)
+	wantString = "target_value_1"
+	if targetA != wantString {
+		t.Errorf("targetA mismatch; got=%s, want %s", targetA, wantString)
 	}
 
-	gotString = "target_value_2"
-	if targetB != gotString {
-		t.Errorf("targetB mismatch; got=%s, want %s", targetB, gotString)
+	wantString = "target_value_2"
+	if targetB != wantString {
+		t.Errorf("targetB mismatch; got=%s, want %s", targetB, wantString)
 	}
 }
 
@@ -100,9 +100,9 @@ func TestMultitypePosArgParse(t *testing.T) {
 		t.Errorf("targetB mismatch; got=%d; want %d", targetB, gotInt)
 	}
 
-	gotIntSlice := []int{10, 20, 30}
-	if !slices.Equal(targetSlice, gotIntSlice) {
-		t.Errorf("targetSlice mismatch; got=%v; want %v", targetSlice, gotIntSlice)
+	wantIntSlice := []int{10, 20, 30}
+	if !slices.Equal(targetSlice, wantIntSlice) {
+		t.Errorf("targetSlice mismatch; got=%v; want %v", targetSlice, wantIntSlice)
 	}
 }
 
@@ -115,9 +115,9 @@ func TestMultiStringFlagParse(t *testing.T) {
 	p := newParser(&c, []string{"app", "--vla", "a", "-v", "b", "--vla", "c"})
 	p.parseFlags()
 
-	gotIntSlice := []string{"a", "b", "c"}
-	if !slices.Equal(targetSlice, gotIntSlice) {
-		t.Errorf("targetSlice mismatch; got=%v; want %v", targetSlice, gotIntSlice)
+	wantIntSlice := []string{"a", "b", "c"}
+	if !slices.Equal(targetSlice, wantIntSlice) {
+		t.Errorf("targetSlice mismatch; got=%v; want %v", targetSlice, wantIntSlice)
 	}
 }
 
