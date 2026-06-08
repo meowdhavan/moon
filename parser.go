@@ -11,6 +11,7 @@ type parser struct {
 	tokens   []string
 	tokenIdx int
 	errors []error
+	warnings []error
 }
 
 func newParser(rootCmd *Command, tokens []string) parser {
@@ -20,6 +21,7 @@ func newParser(rootCmd *Command, tokens []string) parser {
 		tokens: tokens,
 		tokenIdx: 1,
 		errors: make([]error, 0),
+		warnings: make([]error, 0),
 	}
 }
 
@@ -83,7 +85,7 @@ func (p *parser) parseFlags() {
 		if isLongFlag(token) {
 			f, found := p.flagMap[token]
 			if !found {
-				// Warning: Unrecognized flag
+				p.warnings = append(p.warnings, errors.New("Unrecognized flag: " + token))
 				continue
 			}
 
@@ -102,7 +104,7 @@ func (p *parser) parseFlags() {
 			for i, ch := range token[1:] {
 				f, found := p.flagMap["-"+string(ch)]
 				if !found {
-					// Warning: Unrecognized flag
+					p.warnings = append(p.warnings, errors.New("Unrecognized flag: -" + string(ch)))
 					continue
 				}
 
@@ -130,17 +132,18 @@ func (p *parser) parseFlags() {
 		} else {
 			s, found := p.currentCmd.subcommands[token]
 			if !found {
-				// Warning: Unrecognized subcommand
-			} else {
-				p.currentCmd = s
-				p.fillFlagMap()
+				p.warnings = append(p.warnings, errors.New("Unrecognized subcommand: " + token))
+				continue
 			}
+
+			p.currentCmd = s
+			p.fillFlagMap()
 		}
 	}
 
 	for _, f := range p.flagMap {
 		if f.isRequired && !f.isValueSet {
-			// Error: No value supplied for Required Flag
+			p.errors = append(p.errors, errors.New("No value supplied for required flag: --" + f.longNames[0]))
 		}
 	}
 }
