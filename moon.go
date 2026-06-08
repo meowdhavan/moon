@@ -2,23 +2,19 @@ package moon
 
 import "os"
 
-type Command struct {
-	Names      []string
-	AboutShort string
-	AboutLong  string
-	Run        func() error
+func Execute(rootCmd *Command) {
+	parser := newParser(rootCmd, os.Args)
+	parser.parseFlags()
 
-	subcommands     map[string]*Command
-	flags           []flag
-	requiredPosArgs []posArg
-	optionalPosArgs []posArg
-	varLenArg       *varLenArg
-	errors          []error
+	cmd := parser.currentCmd
 
-	parent *Command
-}
+	if len(parser.errors) > 0 {
+		// TODO
+	}
 
-func (c *Command) Execute() {
-	p := newParser(c, os.Args)
-	p.parseFlags()
+	if len(parser.warnings) > 0 {
+		// TODO
+	}
+
+	cmd.Run()
 }
