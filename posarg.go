@@ -80,7 +80,7 @@ func (c *Command) AddIntPosArg(target *int, name string, about string, isRequire
 	}
 }
 
-func (c *Command) AddStringVarLenArg(target []string, name string, about string) {
+func (c *Command) AddStringVarLenArg(target *[]string, name string, about string) {
 	v := &varLenArg{
 		name:  name,
 		about: about,
@@ -90,7 +90,7 @@ func (c *Command) AddStringVarLenArg(target []string, name string, about string)
 				return err
 			}
 
-			target = append(target, v)
+			*target = append(*target, v)
 			return nil
 		},
 	}
@@ -98,7 +98,7 @@ func (c *Command) AddStringVarLenArg(target []string, name string, about string)
 	c.varLenArg = v
 }
 
-func (c *Command) AddIntVarLenArg(target []int, name string, about string) {
+func (c *Command) AddIntVarLenArg(target *[]int, name string, about string) {
 	v := &varLenArg{
 		name:  name,
 		about: about,
@@ -108,7 +108,7 @@ func (c *Command) AddIntVarLenArg(target []int, name string, about string) {
 				return err
 			}
 
-			target = append(target, v)
+			*target = append(*target, v)
 			return nil
 		},
 	}
