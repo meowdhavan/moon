@@ -5,11 +5,11 @@ import "os"
 type Moon struct {
 	rootCmd          *Command
 	SuppressWarnings bool
-	Printer          *printer
+	Printer          Printer
 }
 
 func NewMoon(rootCmd *Command) *Moon {
-	p := newPrinter(os.Stdout)
+	p := newDefaultPrinter(os.Stdout)
 
 	return &Moon{
 		rootCmd: rootCmd,

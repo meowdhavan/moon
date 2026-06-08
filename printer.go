@@ -9,14 +9,27 @@ import (
 	"text/tabwriter"
 )
 
-type printer struct {
+type Printer interface {
+	newLine() 
+	printError(*parser) 
+	printWarning(*parser) 
+	printHelp(*Command) 
+	printIntroLine(*Command) 
+	printFullUsage(*Command) 
+	printAboutLong(*Command) 
+	printUsage(*Command) 
+	printSubcommands(*Command) 
+	printFlags(*Command) 
+}
+
+type defaultPrinter struct {
 	w       io.Writer
 	Heading func(string) string
 	Focus   func(string) string
 }
 
-func newPrinter(w io.Writer) printer {
-	return printer{
+func newDefaultPrinter(w io.Writer) defaultPrinter {
+	return defaultPrinter{
 		w: w,
 		Heading: func(s string) string {
 			return underlineText(s)
@@ -35,11 +48,11 @@ func underlineText(s string) string {
 	return fmt.Sprintf("\x1b[4m%s\x1b[24m", s)
 }
 
-func (p *printer) newLine() {
+func (p *defaultPrinter) newLine() {
 	fmt.Fprintln(p.w)
 }
 
-func (p *printer) printError(parser *parser) {
+func (p *defaultPrinter) printError(parser *parser) {
 	if len(parser.errors) == 0 {
 		return
 	}
@@ -55,7 +68,7 @@ func (p *printer) printError(parser *parser) {
 	}
 }
 
-func (p *printer) printWarning(parser *parser) {
+func (p *defaultPrinter) printWarning(parser *parser) {
 	if len(parser.warnings) == 0 {
 		return
 	}
@@ -71,7 +84,7 @@ func (p *printer) printWarning(parser *parser) {
 	}
 }
 
-func (p *printer) printHelp(c *Command) {
+func (p *defaultPrinter) printHelp(c *Command) {
 	p.printIntroLine(c)
 	p.newLine()
 	p.printAboutLong(c)
@@ -81,7 +94,7 @@ func (p *printer) printHelp(c *Command) {
 	p.printFullUsage(c)
 }
 
-func (p *printer) printIntroLine(c *Command) {
+func (p *defaultPrinter) printIntroLine(c *Command) {
 	fmt.Fprint(p.w, p.Focus(c.Names[0]))
 	if c.AboutShort != "" {
 		fmt.Fprint(p.w, " - ")
@@ -91,7 +104,7 @@ func (p *printer) printIntroLine(c *Command) {
 	fmt.Fprintln(p.w)
 }
 
-func (p *printer) printFullUsage(c *Command) {
+func (p *defaultPrinter) printFullUsage(c *Command) {
 	p.printUsage(c)
 	p.newLine()
 	p.printSubcommands(c)
@@ -101,7 +114,7 @@ func (p *printer) printFullUsage(c *Command) {
 	p.printFlags(c)
 }
 
-func (p *printer) printAboutLong(c *Command) {
+func (p *defaultPrinter) printAboutLong(c *Command) {
 	if c.AboutLong == "" {
 		return
 	}
@@ -109,7 +122,7 @@ func (p *printer) printAboutLong(c *Command) {
 	fmt.Fprintln(p.w, c.AboutLong)
 }
 
-func (p *printer) printUsage(c *Command) {
+func (p *defaultPrinter) printUsage(c *Command) {
 	fmt.Fprintln(p.w, p.Heading("Usage:"))
 
 	fmt.Fprint(p.w, "    ")
@@ -151,7 +164,7 @@ func (p *printer) printUsage(c *Command) {
 	fmt.Fprintln(p.w)
 }
 
-func (p *printer) printSubcommands(c *Command) {
+func (p *defaultPrinter) printSubcommands(c *Command) {
 	if len(c.subcommands) == 0 {
 		return
 	}
@@ -171,7 +184,7 @@ func (p *printer) printSubcommands(c *Command) {
 	tw.Flush()
 }
 
-func (p *printer) printFlags(c *Command) {
+func (p *defaultPrinter) printFlags(c *Command) {
 	if len(c.flags) == 0 {
 		return
 	}
@@ -180,28 +193,25 @@ func (p *printer) printFlags(c *Command) {
 
 	tw := tabwriter.NewWriter(p.w, 5, 0, 2, ' ', 0)
 
-	p.addFlags(c, tw)
+	var cur *Command
+	cur = c
 
-	tw.Flush()
-}
+	for cur != nil {
+		for _, f := range cur.flags {
+			fmt.Fprintf(tw, "    %s", p.Focus("--"+f.longNames[0]))
 
-func (p *printer) addFlags(c *Command, tw *tabwriter.Writer) {
-	if c == nil {
-		return
-	}
+			if f.shortName != "" {
+				fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))
+			} else {
+				fmt.Fprintf(tw, "\t")
+			}
 
-	for _, f := range c.flags {
-		fmt.Fprintf(tw, "    %s", p.Focus("--"+f.longNames[0]))
-
-		if f.shortName != "" {
-			fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))
-		} else {
-			fmt.Fprintf(tw, "\t")
+			fmt.Fprintf(tw, "\t%s", f.about)
+			fmt.Fprintln(tw)
 		}
 
-		fmt.Fprintf(tw, "\t%s", f.about)
-		fmt.Fprintln(tw)
+		cur = cur.parent
 	}
 
-	p.addFlags(c.parent, tw)
+	tw.Flush()
 }

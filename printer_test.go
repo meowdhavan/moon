@@ -28,7 +28,7 @@ func TestIntroLinePrint(t *testing.T) {
 
 	w := CustomWriter{}
 
-	p := newPrinter(&w)
+	p := newDefaultPrinter(&w)
 	p.Focus = func(s string) string {
 		return s
 	}
@@ -39,8 +39,7 @@ func TestIntroLinePrint(t *testing.T) {
 	p.printIntroLine(&c)
 
 	got := w.String()
-	want := `app - short about
-`
+	want := "app - short about\n"
 
 	if got != want {
 		t.Errorf("Intro Line: '%s'; want = '%s'", got, want)
