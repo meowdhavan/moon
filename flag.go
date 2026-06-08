@@ -1,4 +1,4 @@
-package mon
+package moon
 
 type flag struct {
 	longNames   []string
