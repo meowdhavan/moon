@@ -11,7 +11,6 @@ type Command struct {
 	requiredPosArgs []posArg
 	optionalPosArgs []posArg
 	varLenArg       *varLenArg
-	errors          []error
 
 	parent *Command
 }
