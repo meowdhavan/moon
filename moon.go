@@ -2,35 +2,50 @@ package moon
 
 import "os"
 
-func Execute(rootCmd *Command) {
+type Moon struct {
+	rootCmd          *Command
+	SuppressWarnings bool
+	Printer          *printer
+}
+
+func NewMoon(rootCmd *Command) *Moon {
+	p := newPrinter(os.Stdout)
+
+	return &Moon{
+		rootCmd: rootCmd,
+		Printer: &p,
+	}
+}
+
+func (m *Moon) Execute() {
 	showHelp := false
 
-	rootCmd.AddBoolFlag(&showHelp, []string{"help"}, "h", "Show help message", false)
+	m.rootCmd.AddBoolFlag(&showHelp, []string{"help"}, "h", "Show help message", false)
 
-	parser := newParser(rootCmd, os.Args)
+	parser := newParser(m.rootCmd, os.Args)
 	parser.parseFlags()
 
 	cmd := parser.currentCmd
 
-	printer := newPrinter(os.Stdout)
-
-	if showHelp {
-		printer.printHelp(cmd)
+	if showHelp || cmd.Run == nil {
+		m.Printer.printHelp(cmd)
 		os.Exit(0)
 	}
 
-	printer.printError(&parser)
+	m.Printer.printError(&parser)
 	if len(parser.errors) > 0 {
-		printer.newLine()
+		m.Printer.newLine()
 	}
 
-	printer.printWarning(&parser)
-	if len(parser.warnings) > 0 {
-		printer.newLine()
+	if !m.SuppressWarnings {
+		m.Printer.printWarning(&parser)
+		if len(parser.warnings) > 0 {
+			m.Printer.newLine()
+		}
 	}
 
 	if len(parser.errors) > 0 {
-		printer.printFullUsage(cmd)
+		m.Printer.printFullUsage(cmd)
 		os.Exit(3)
 	}
 
