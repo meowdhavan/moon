@@ -41,6 +41,10 @@ func (p *printer) printHelp(c *Command) {
 	}
 
 	fmt.Fprintln(p.w)
+	p.printFullUsage(c)
+}
+
+func (p *printer) printFullUsage(c *Command) {
 	fmt.Fprintf(p.w, "%s ", p.Heading("Usage:"))
 	p.printUsage(c)
 
@@ -82,7 +86,7 @@ func (p *printer) printUsage(c *Command) {
 		fmt.Fprint(p.w, " <COMMAND>")
 	} else {
 		fmt.Fprint(p.w, " ")
-		// TODO
+		// TODO: Pos Args
 	}
 
 	fmt.Fprintln(p.w)
