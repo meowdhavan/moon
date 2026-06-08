@@ -124,13 +124,13 @@ func (p *parser) parseFlags(c *Command) {
 				}
 			}
 		} else {
-			for _, f := range c.flags {
-				if f.isRequired && !f.isValueSet {
-					// Error: No value supplied for Required Flag
-				}
-			}
-
 			// TODO: Subcommand
+		}
+	}
+
+	for _, f := range c.flags {
+		if f.isRequired && !f.isValueSet {
+			// Error: No value supplied for Required Flag
 		}
 	}
 }
