@@ -79,7 +79,7 @@ func (p *parser) fillSubcommandsMap() {
 // Sets the value of a flag, and indicates that there has been an attempt to set a value.
 // `isValueSet` must be set to true even if there was an attempt to set an invalid value.
 // Not doing so will result in an additional error for an unset value.
-func (p *parser) setValue(f *Flag, val string) error {
+func (p *parser) setValue(f *Variable, val string) error {
 	err := f.setValue(val)
 	f.isValueSet = true
 
@@ -88,7 +88,7 @@ func (p *parser) setValue(f *Flag, val string) error {
 
 func (p *parser) setNextTokenAsValue(f *Flag) error {
 	if p.tokenIdx+1 < len(p.tokens) && !isFlag(p.tokens[p.tokenIdx+1]) {
-		err := p.setValue(f, p.tokens[p.tokenIdx+1])
+		err := p.setValue(&f.Variable, p.tokens[p.tokenIdx+1])
 		p.tokenIdx++
 
 		if err != nil {
@@ -123,7 +123,7 @@ func (p *parser) parseFlags() {
 					p.errors = append(p.errors, err)
 				}
 			} else {
-				err := p.setValue(f, "true")
+				err := p.setValue(&f.Variable, "true")
 				if err != nil {
 					p.errors = append(p.errors, err)
 				}
@@ -139,7 +139,7 @@ func (p *parser) parseFlags() {
 
 				if f.requiresVal {
 					if i + 2 < len(token) {
-						err := p.setValue(f, token[i+2:])
+						err := p.setValue(&f.Variable, token[i+2:])
 						if err != nil {
 							p.errors = append(p.errors, err)
 						}
@@ -152,7 +152,7 @@ func (p *parser) parseFlags() {
 
 					break
 				} else {
-					err := p.setValue(f, "true")
+					err := p.setValue(&f.Variable, "true")
 					if err != nil {
 						p.errors = append(p.errors, err)
 					}
@@ -202,7 +202,7 @@ func (p *parser) parseFlags() {
 
 	for _, f := range p.flagMap {
 		if !f.isValueSet {
-			p.setFromFallback(f)
+			p.setFromFallback(&f.Variable)
 		}
 
 		if !f.isValueSet && f.isRequired {
@@ -210,9 +210,14 @@ func (p *parser) parseFlags() {
 			p.errors = append(p.errors, err)
 		}
 	}
+
+	for i := p.optionalPosArgIdx; i < len(p.currentCmd.optionalPosArgs); i++ {
+		a := p.currentCmd.optionalPosArgs[i]
+		p.setFromFallback(&a.Variable)
+	}
 }
 
-func (p *parser) setFromFallback(f *Flag) {
+func (p *parser) setFromFallback(f *Variable) {
 	setFromEnv := func() *string {
 		if f.env == nil {
 			return nil

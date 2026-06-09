@@ -8,6 +8,7 @@ type Variable struct {
 	env        *string
 	defaultVal *string
 	isRequired bool
+	isValueSet bool
 }
 
 type variableOption func(*Variable)

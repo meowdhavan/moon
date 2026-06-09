@@ -8,7 +8,6 @@ type Flag struct {
 	Variable
 	shortName   string
 	requiresVal bool
-	isValueSet  bool
 }
 
 func (c *Command) StringFlag(target *string, name string, shortName string, about string, options ...variableOption) {
