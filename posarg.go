@@ -2,19 +2,16 @@ package moon
 
 import "github.com/meowdhavan/moon/converter"
 
-type posArg struct {
+type PosArg struct {
 	Variable
 }
 
-type varLenArg struct {
-	name     string
-	aliases  []string
-	about    string
-	addValue func(string) error
+type VarLenArg struct {
+	Variable
 }
 
-func (c *Command) AddStringPosArg(target *string, name string, about string, options ...variableOption) {
-	posArg := &posArg{
+func (c *Command) StringPosArg(target *string, name string, about string, options ...variableOption) {
+	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
 			aliases: []string{},
@@ -42,31 +39,37 @@ func (c *Command) AddStringPosArg(target *string, name string, about string, opt
 	}
 }
 
-func (c *Command) AddStringVarLenArg(target *[]string, name string, about string) {
+func (c *Command) StringVarLenArg(target *[]string, name string, about string, options ...variableOption) {
 	*target = []string{}
 
-	v := &varLenArg{
-		name:    name,
-		aliases: []string{},
-		about:   about,
-		addValue: func(s string) error {
-			v, err := converter.ToString(s)
-			if err != nil {
-				return err
-			}
+	v := &VarLenArg{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToString(s)
+				if err != nil {
+					return err
+				}
 
-			*target = append(*target, v)
-			return nil
+				*target = append(*target, v)
+				return nil
+			},
 		},
+	}
+
+	for _, opt := range options {
+		opt(&v.Variable)
 	}
 
 	c.varLenArg = v
 }
 
-func (c *Command) AddBoolPosArg(target *bool, name string, about string, options ...variableOption) {
+func (c *Command) BoolPosArg(target *bool, name string, about string, options ...variableOption) {
 	*target = false
 
-	posArg := &posArg{
+	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
 			aliases: []string{},
@@ -94,8 +97,8 @@ func (c *Command) AddBoolPosArg(target *bool, name string, about string, options
 	}
 }
 
-func (c *Command) AddIntPosArg(target *int, name string, about string, options ...variableOption) {
-	posArg := &posArg{
+func (c *Command) IntPosArg(target *int, name string, about string, options ...variableOption) {
+	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
 			aliases: []string{},
@@ -123,22 +126,28 @@ func (c *Command) AddIntPosArg(target *int, name string, about string, options .
 	}
 }
 
-func (c *Command) AddIntVarLenArg(target *[]int, name string, about string) {
+func (c *Command) IntVarLenArg(target *[]int, name string, about string, options ...variableOption) {
 	*target = []int{}
 
-	v := &varLenArg{
-		name:    name,
-		aliases: []string{},
-		about:   about,
-		addValue: func(s string) error {
-			v, err := converter.ToInt(s)
-			if err != nil {
-				return err
-			}
+	v := &VarLenArg{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToInt(s)
+				if err != nil {
+					return err
+				}
 
-			*target = append(*target, v)
-			return nil
+				*target = append(*target, v)
+				return nil
+			},
 		},
+	}
+
+	for _, opt := range options {
+		opt(&v.Variable)
 	}
 
 	c.varLenArg = v

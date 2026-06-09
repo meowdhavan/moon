@@ -58,8 +58,8 @@ func TestStringPosArgParse(t *testing.T) {
 	var targetB string
 
 	c := Command{}
-	c.AddStringPosArg(&targetA, "a", "")
-	c.AddStringPosArg(&targetB, "b", "")
+	c.StringPosArg(&targetA, "a", "")
+	c.StringPosArg(&targetB, "b", "")
 
 	p := newParser(&c, []string{"app", "target_value_1", "target_value_2"})
 	p.parseFlags()
@@ -83,9 +83,9 @@ func TestMultitypePosArgParse(t *testing.T) {
 	var targetSlice []int
 
 	c := Command{}
-	c.AddStringPosArg(&targetA, "a", "", Required())
-	c.AddIntPosArg(&targetB, "b", "")
-	c.AddIntVarLenArg(&targetSlice, "vla", "")
+	c.StringPosArg(&targetA, "a", "", Required())
+	c.IntPosArg(&targetB, "b", "")
+	c.IntVarLenArg(&targetSlice, "vla", "")
 
 	p := newParser(&c, []string{"app", "target_value_1", "123", "10", "20", "30"})
 	p.parseFlags()

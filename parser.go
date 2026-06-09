@@ -171,7 +171,7 @@ func (p *parser) parseFlags() {
 				p.fillFlagMap()
 				p.fillSubcommandsMap()
 			} else {
-				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs) {
+				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs) { // Required PosArg
 					a := p.currentCmd.requiredPosArgs[p.requiredPosArgIdx]
 					err := a.setValue(token)
 					if err != nil {
@@ -179,7 +179,7 @@ func (p *parser) parseFlags() {
 					}
 
 					p.requiredPosArgIdx++
-				} else if p.optionalPosArgIdx < len(p.currentCmd.optionalPosArgs) {
+				} else if p.optionalPosArgIdx < len(p.currentCmd.optionalPosArgs) { // Optional PosArg
 					a := p.currentCmd.optionalPosArgs[p.optionalPosArgIdx]
 					err := a.setValue(token)
 					if err != nil {
@@ -187,14 +187,14 @@ func (p *parser) parseFlags() {
 					}
 
 					p.optionalPosArgIdx++
-				} else {
+				} else { // VarLenArg
 					v := p.currentCmd.varLenArg
 					if v == nil {
 						warning := errors.New("Unrecognized argument: " + token)
 						p.warnings = append(p.warnings, warning)
 						continue
 					}
-					v.addValue(token)
+					v.setValue(token)
 				}
 			}
 		}
@@ -211,14 +211,13 @@ func (p *parser) parseFlags() {
 		}
 	}
 
-	for i := p.optionalPosArgIdx; i < len(p.currentCmd.optionalPosArgs); i++ {
-		a := p.currentCmd.optionalPosArgs[i]
+	for _, a := range p.currentCmd.optionalPosArgs[p.optionalPosArgIdx:] {
 		p.setFromFallback(&a.Variable)
 	}
 }
 
 func (p *parser) setFromFallback(f *Variable) {
-	setFromEnv := func() *string {
+	getFromEnv := func() *string {
 		if f.env == nil {
 			return nil
 		}
@@ -231,7 +230,7 @@ func (p *parser) setFromFallback(f *Variable) {
 		return &val
 	}
 
-	setDefault := func() *string {
+	getDefault := func() *string {
 		if f.defaultVal == nil {
 			return nil
 		}
@@ -239,7 +238,7 @@ func (p *parser) setFromFallback(f *Variable) {
 		return f.defaultVal
 	}
 
-	fallbacks := []func() *string {setFromEnv, setDefault}
+	fallbacks := []func() *string {getFromEnv, getDefault}
 
 	for _, fallback := range fallbacks {
 		s := fallback()

@@ -8,14 +8,14 @@ type Command struct {
 
 	subcommands     []*Command
 	flags           []*Flag
-	requiredPosArgs []*posArg
-	optionalPosArgs []*posArg
-	varLenArg       *varLenArg
+	requiredPosArgs []*PosArg
+	optionalPosArgs []*PosArg
+	varLenArg       *VarLenArg
 
 	parent *Command
 }
 
-func (c *Command) AddSubcommand(s *Command) {
+func (c *Command) Subcommand(s *Command) {
 	s.parent = c
 	c.subcommands = append(c.subcommands, s)
 }
