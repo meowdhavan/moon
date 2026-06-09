@@ -19,7 +19,7 @@ func (c *CustomWriter) String() string {
 
 func TestIntroLinePrint(t *testing.T) {
 	c := Command{
-		Names: []string{"app"},
+		Name: "app",
 		AboutShort: "short about",
 		AboutLong: "Long About Section",
 	}

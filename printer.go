@@ -82,7 +82,7 @@ func (p *defaultPrinter) printHelp(c *Command) {
 }
 
 func (p *defaultPrinter) printIntroLine(c *Command) {
-	fmt.Fprint(p.w, p.Focus(c.Names[0]))
+	fmt.Fprint(p.w, p.Focus(c.Name))
 	if c.AboutShort != "" {
 		fmt.Fprint(p.w, " - ")
 		fmt.Fprint(p.w, c.AboutShort)
@@ -120,7 +120,7 @@ func (p *defaultPrinter) printUsage(c *Command) {
 	commands := []string{}
 
 	for cur != nil {
-		commands = append(commands, cur.Names[0])
+		commands = append(commands, cur.Name)
 		cur = cur.parent
 	}
 
@@ -161,7 +161,7 @@ func (p *defaultPrinter) printSubcommands(c *Command) {
 	tw := tabwriter.NewWriter(p.w, 5, 0, 2, ' ', 0)
 
 	for _, s := range c.subcommands {
-		fmt.Fprintf(tw, "    %s", p.Focus(s.Names[0]))
+		fmt.Fprintf(tw, "    %s", p.Focus(s.Name))
 
 		fmt.Fprintf(tw, "\t%s", s.AboutShort)
 	}

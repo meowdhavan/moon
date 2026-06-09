@@ -67,9 +67,10 @@ func (p *parser) fillSubcommandsMap() {
 	}
 
 	for _, s := range p.currentCmd.subcommands {
-		for _, name := range s.Names {
-			if name != "" {
-				p.subcommandsMap[name] = s
+		p.subcommandsMap[s.Name] = s
+		for _, alias := range s.Aliases {
+			if alias != "" {
+				p.subcommandsMap[alias] = s
 			}
 		}
 	}

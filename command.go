@@ -1,7 +1,8 @@
 package moon
 
 type Command struct {
-	Names      []string
+	Name       string
+	Aliases    []string
 	AboutShort string
 	AboutLong  string
 	Run        func() error
