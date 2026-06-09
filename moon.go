@@ -23,11 +23,11 @@ func (m *Moon) Execute() {
 	m.rootCmd.BoolFlag(&showHelp, "help", "h", "Show help message")
 
 	parser := newParser(m.rootCmd, os.Args)
-	parser.parseFlags()
+	parser.parse()
 
 	cmd := parser.currentCmd
 
-	if showHelp || cmd.Run == nil {
+	if !parser.unrecognizedSubcommand && (showHelp || cmd.Run == nil) {
 		m.Printer.printHelp(cmd)
 		os.Exit(0)
 	}

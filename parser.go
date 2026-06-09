@@ -6,28 +6,29 @@ import (
 )
 
 type parser struct {
-	tokens   []string
-	tokenIdx int
-	flagMap  map[string]*Flag
-	subcommandsMap map[string]*Command
-	currentCmd *Command
+	tokens            []string
+	tokenIdx          int
+	flagMap           map[string]*Flag
+	subcommandsMap    map[string]*Command
+	currentCmd        *Command
 	requiredPosArgIdx int
 	optionalPosArgIdx int
-	errors []error
-	warnings []error
+	errors            []error
+	warnings          []error
+	unrecognizedSubcommand         bool
 }
 
 func newParser(rootCmd *Command, tokens []string) parser {
 	return parser{
-		currentCmd: rootCmd,
-		flagMap:  make(map[string]*Flag),
-		subcommandsMap: make(map[string]*Command),
-		tokens: tokens,
-		tokenIdx: 1,
+		currentCmd:        rootCmd,
+		flagMap:           make(map[string]*Flag),
+		subcommandsMap:    make(map[string]*Command),
+		tokens:            tokens,
+		tokenIdx:          1,
 		requiredPosArgIdx: 0,
 		optionalPosArgIdx: 0,
-		errors: make([]error, 0),
-		warnings: make([]error, 0),
+		errors:            make([]error, 0),
+		warnings:          make([]error, 0),
 	}
 }
 
@@ -102,7 +103,7 @@ func (p *parser) setNextTokenAsValue(f *Flag) error {
 	return nil
 }
 
-func (p *parser) parseFlags() {
+func (p *parser) parse() {
 	p.fillFlagMap()
 	p.fillSubcommandsMap()
 
@@ -138,7 +139,7 @@ func (p *parser) parseFlags() {
 				}
 
 				if f.requiresVal {
-					if i + 2 < len(token) {
+					if i+2 < len(token) {
 						err := p.setValue(&f.Variable, token[i+2:])
 						if err != nil {
 							p.errors = append(p.errors, err)
@@ -160,10 +161,15 @@ func (p *parser) parseFlags() {
 			}
 		} else {
 			if len(p.currentCmd.subcommands) > 0 {
+				if p.unrecognizedSubcommand {
+					continue
+				}
+
 				s, found := p.subcommandsMap[token]
 				if !found {
 					warning := errors.New("Unrecognized subcommand: " + token)
 					p.warnings = append(p.warnings, warning)
+					p.unrecognizedSubcommand = true
 					continue
 				}
 
@@ -217,7 +223,7 @@ func (p *parser) parseFlags() {
 }
 
 func (p *parser) setFromFallbacks(f *Variable) {
-	fallbacks := []func(*Variable) *string {getFromEnv, getDefault}
+	fallbacks := []func(*Variable) *string{getFromEnv, getDefault}
 
 	for _, fallback := range fallbacks {
 		s := fallback(f)

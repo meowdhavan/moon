@@ -14,7 +14,7 @@ func TestLongStringFlagParse(t *testing.T) {
 	c.StringFlag(&targetB, "test-flag-b", "", "")
 
 	p := newParser(&c, []string{"app", "--test-flag-a", "target_value_1", "--test-flag-b", "target_value_2"})
-	p.parseFlags()
+	p.parse()
 
 	var wantString string
 
@@ -38,7 +38,7 @@ func TestShortStringFlagParse(t *testing.T) {
 	c.StringFlag(&targetB, "", "b", "")
 
 	p := newParser(&c, []string{"app", "-a", "target_value_1", "-btarget_value_2"})
-	p.parseFlags()
+	p.parse()
 
 	var wantString string
 
@@ -62,7 +62,7 @@ func TestStringPosArgParse(t *testing.T) {
 	c.StringPosArg(&targetB, "b", "")
 
 	p := newParser(&c, []string{"app", "target_value_1", "target_value_2"})
-	p.parseFlags()
+	p.parse()
 
 	var wantString string
 
@@ -88,7 +88,7 @@ func TestMultitypePosArgParse(t *testing.T) {
 	c.IntVarLenArg(&targetSlice, "vla", "")
 
 	p := newParser(&c, []string{"app", "target_value_1", "123", "10", "20", "30"})
-	p.parseFlags()
+	p.parse()
 
 	gotString := "target_value_1"
 	if targetA != gotString {
@@ -113,7 +113,7 @@ func TestMultiStringFlagParse(t *testing.T) {
 	c.MultiStringFlag(&targetSlice, "vla", "v", "")
 
 	p := newParser(&c, []string{"app", "--vla", "a", "-v", "b", "--vla", "c"})
-	p.parseFlags()
+	p.parse()
 
 	wantIntSlice := []string{"a", "b", "c"}
 	if !slices.Equal(targetSlice, wantIntSlice) {
@@ -128,7 +128,7 @@ func TestMultiBoolFlagParse(t *testing.T) {
 	c.MultiBoolFlag(&target, "vla", "v", "")
 
 	p := newParser(&c, []string{"app", "--vla", "-v", "--vla", "-v", "--vla"})
-	p.parseFlags()
+	p.parse()
 
 	want := 5
 	if target != want {
@@ -143,12 +143,50 @@ func TestStringFlagDefaultValueParse(t *testing.T) {
 	c.StringFlag(&targetA, "test-flag", "", "", Default("target_value"))
 
 	p := newParser(&c, []string{"app"})
-	p.parseFlags()
+	p.parse()
 
 	var wantString string
 
 	wantString = "target_value"
 	if targetA != wantString {
 		t.Errorf("targetA mismatch; got=%s, want %s", targetA, wantString)
+	}
+}
+
+func TestSubcommandParse(t *testing.T) {
+	rootCmd := Command{Name: "root"}
+	subCmd := Command{Name: "sub"}
+
+	rootCmd.Subcommand(&subCmd)
+
+	p := newParser(&rootCmd, []string{"app", "sub"})
+	p.parse()
+
+	got := p.currentCmd.Name
+	want := subCmd.Name
+
+	if got != want {
+		t.Errorf("subCmd mismatch; got=%s, want %s", got, want)
+	}
+}
+
+func TestInvalidSubcommandParse(t *testing.T) {
+	rootCmd := Command{Name: "root"}
+	subCmd := Command{Name: "sub"}
+
+	rootCmd.Subcommand(&subCmd)
+
+	p := newParser(&rootCmd, []string{"app", "incorrect", "sub"})
+	p.parse()
+
+	gotName := p.currentCmd.Name
+	wantName := rootCmd.Name
+
+	if gotName != wantName {
+		t.Errorf("subCmd mismatch; got=%s, want %s", gotName, wantName)
+	}
+
+	if !p.unrecognizedSubcommand {
+		t.Errorf("p.unrecognizedSubcommand mismatch; got=%v, want %v", p.unrecognizedSubcommand, true)
 	}
 }
