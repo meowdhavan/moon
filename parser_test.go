@@ -10,8 +10,8 @@ func TestLongStringFlagParse(t *testing.T) {
 	var targetB string
 
 	c := Command{}
-	c.AddStringFlag(&targetA, []string{"test-flag-a"}, "", "", false)
-	c.AddStringFlag(&targetB, []string{"test-flag-b"}, "", "", false)
+	c.AddStringFlag(&targetA, []string{"test-flag-a"}, "", "", nil, nil, false)
+	c.AddStringFlag(&targetB, []string{"test-flag-b"}, "", "", nil, nil, false)
 
 	p := newParser(&c, []string{"app", "--test-flag-a", "target_value_1", "--test-flag-b", "target_value_2"})
 	p.parseFlags()
@@ -34,8 +34,8 @@ func TestShortStringFlagParse(t *testing.T) {
 	var targetB string
 
 	c := Command{}
-	c.AddStringFlag(&targetA, []string{}, "a", "", false)
-	c.AddStringFlag(&targetB, []string{}, "b", "", false)
+	c.AddStringFlag(&targetA, []string{}, "a", "", nil, nil, false)
+	c.AddStringFlag(&targetB, []string{}, "b", "", nil, nil, false)
 
 	p := newParser(&c, []string{"app", "-a", "target_value_1", "-btarget_value_2"})
 	p.parseFlags()
