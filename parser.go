@@ -2,7 +2,6 @@ package moon
 
 import (
 	"errors"
-	"os"
 	"strings"
 )
 
@@ -202,7 +201,7 @@ func (p *parser) parseFlags() {
 
 	for _, f := range p.flagMap {
 		if !f.isValueSet {
-			p.setFromFallback(&f.Variable)
+			p.setFromFallbacks(&f.Variable)
 		}
 
 		if !f.isValueSet && f.isRequired {
@@ -212,36 +211,15 @@ func (p *parser) parseFlags() {
 	}
 
 	for _, a := range p.currentCmd.optionalPosArgs[p.optionalPosArgIdx:] {
-		p.setFromFallback(&a.Variable)
+		p.setFromFallbacks(&a.Variable)
 	}
 }
 
-func (p *parser) setFromFallback(f *Variable) {
-	getFromEnv := func() *string {
-		if f.env == nil {
-			return nil
-		}
-
-		val := os.Getenv(*f.env)
-		if val == "" {
-			return nil
-		}
-		
-		return &val
-	}
-
-	getDefault := func() *string {
-		if f.defaultVal == nil {
-			return nil
-		}
-
-		return f.defaultVal
-	}
-
-	fallbacks := []func() *string {getFromEnv, getDefault}
+func (p *parser) setFromFallbacks(f *Variable) {
+	fallbacks := []func(*Variable) *string {getFromEnv, getDefault}
 
 	for _, fallback := range fallbacks {
-		s := fallback()
+		s := fallback(f)
 
 		if s != nil {
 			err := p.setValue(f, *s)
