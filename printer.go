@@ -11,10 +11,10 @@ import (
 
 type Printer interface {
 	newLine()
-	printError(*parser) 
-	printWarning(*parser) 
-	printHelp(*Command) 
-	printFullUsage(*Command) 
+	printError(*parser)
+	printWarning(*parser)
+	printHelp(*Command)
+	printFullUsage(*Command)
 }
 
 type defaultPrinter struct {
@@ -47,7 +47,7 @@ func (p *defaultPrinter) printError(parser *parser) {
 	if len(parser.errors) == 1 {
 		fmt.Fprintf(p.w, "%s\n", p.Heading("Error:"))
 	} else {
-		fmt.Fprintf(p.w, "%s\n", p.Heading("Errors (" + strconv.Itoa(len(parser.errors)) + "):"))
+		fmt.Fprintf(p.w, "%s\n", p.Heading("Errors ("+strconv.Itoa(len(parser.errors))+"):"))
 	}
 
 	for _, e := range parser.errors {
@@ -63,7 +63,7 @@ func (p *defaultPrinter) printWarning(parser *parser) {
 	if len(parser.warnings) == 1 {
 		fmt.Fprintf(p.w, "%s\n", p.Heading("Warning:"))
 	} else {
-		fmt.Fprintf(p.w, "%s\n", p.Heading("Warnings (" + strconv.Itoa(len(parser.warnings)) + "):"))
+		fmt.Fprintf(p.w, "%s\n", p.Heading("Warnings ("+strconv.Itoa(len(parser.warnings))+"):"))
 	}
 
 	for _, e := range parser.warnings {
@@ -172,7 +172,17 @@ func (p *defaultPrinter) printSubcommands(c *Command) {
 }
 
 func (p *defaultPrinter) printFlags(c *Command) {
-	if len(c.flags) == 0 {
+	flags := []*Flag{}
+
+	var cur *Command
+	cur = c
+
+	for cur != nil {
+		flags = append(flags, cur.flags...)
+		cur = cur.parent
+	}
+
+	if len(flags) == 0 {
 		return
 	}
 
@@ -180,24 +190,17 @@ func (p *defaultPrinter) printFlags(c *Command) {
 
 	tw := tabwriter.NewWriter(p.w, 5, 0, 2, ' ', 0)
 
-	var cur *Command
-	cur = c
+	for _, f := range flags {
+		fmt.Fprintf(tw, "    %s", p.Focus("--"+f.name))
 
-	for cur != nil {
-		for _, f := range cur.flags {
-			fmt.Fprintf(tw, "    %s", p.Focus("--"+f.name))
-
-			if f.shortName != "" {
-				fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))
-			} else {
-				fmt.Fprintf(tw, "\t")
-			}
-
-			fmt.Fprintf(tw, "\t%s", f.about)
-			fmt.Fprintln(tw)
+		if f.shortName != "" {
+			fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))
+		} else {
+			fmt.Fprintf(tw, "\t")
 		}
 
-		cur = cur.parent
+		fmt.Fprintf(tw, "\t%s", f.about)
+		fmt.Fprintln(tw)
 	}
 
 	tw.Flush()
