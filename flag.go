@@ -1,24 +1,58 @@
 package moon
 
-import "github.com/meowdhavan/moon/converter"
+import (
+	"github.com/meowdhavan/moon/converter"
+)
 
 type flag struct {
 	longNames   []string
 	shortName   string
 	about       string
 	requiresVal bool
-	isRequired  bool
 	setValue    func(string) error
 	isValueSet  bool
+	env         *string
+	defaultVal  *string
+	isRequired  bool
 }
 
-func (c *Command) AddStringFlag(target *string, longNames []string, shortName string, about string, isRequired bool) {
-	c.flags = append(c.flags, &flag{
-		longNames: longNames,
+type flagOption func(*flag)
+
+func Alias(longName string) flagOption {
+	return func(f *flag) {
+		f.longNames = append(f.longNames, longName)
+	}
+}
+
+func About(about string) flagOption {
+	return func(f *flag) {
+		f.about = about
+	}
+}
+
+func Env(env string) flagOption {
+	return func(f *flag) {
+		*f.env = env
+	}
+}
+
+func Default(defaultVal string) flagOption {
+	return func(f *flag) {
+		f.defaultVal = &defaultVal
+	}
+}
+
+func Required() flagOption {
+	return func(f *flag) {
+		f.isRequired = true
+	}
+}
+
+func (c *Command) StringFlag(target *string, longName string, shortName string, options ...flagOption) {
+	f := &flag{
+		longNames: []string{longName},
 		shortName: shortName,
-		about: about,
 		requiresVal: true,
-		isRequired: isRequired,
 		setValue: func(s string) error {
 			v, err := converter.ToString(s)
 			if err != nil {
@@ -28,19 +62,22 @@ func (c *Command) AddStringFlag(target *string, longNames []string, shortName st
 			*target = v
 			return nil
 		},
-		isValueSet: false,
-	})
+	}
+
+	for _, opt := range options {
+		opt(f)
+	}
+
+	c.flags = append(c.flags, f)
 }
 
-func (c *Command) AddMultiStringFlag(target *[]string, longNames []string, shortName string, about string) {
+func (c *Command) MultiStringFlag(target *[]string, longName string, shortName string, options ...flagOption) {
 	*target = []string{}
 
-	c.flags = append(c.flags, &flag{
-		longNames: longNames,
-		shortName: shortName,
-		about: about,
+	f := &flag{
+		longNames:   []string{longName},
+		shortName:   shortName,
 		requiresVal: true,
-		isRequired: false,
 		setValue: func(s string) error {
 			v, err := converter.ToString(s)
 			if err != nil {
@@ -50,19 +87,21 @@ func (c *Command) AddMultiStringFlag(target *[]string, longNames []string, short
 			*target = append(*target, v)
 			return nil
 		},
-		isValueSet: false,
-	})
+	}
+
+	for _, opt := range options {
+		opt(f)
+	}
+
+	c.flags = append(c.flags, f)
 }
 
-func (c *Command) AddBoolFlag(target *bool, longNames []string, shortName string, about string) {
+func (c *Command) BoolFlag(target *bool, longName string, shortName string, options ...flagOption) {
 	*target = false
 
-	c.flags = append(c.flags, &flag{
-		longNames: longNames,
-		shortName: shortName,
-		about: about,
-		requiresVal: false,
-		isRequired: false,
+	f := &flag{
+		longNames:   []string{longName},
+		shortName:   shortName,
 		setValue: func(s string) error {
 			v, err := converter.ToBool(s)
 			if err != nil {
@@ -72,19 +111,21 @@ func (c *Command) AddBoolFlag(target *bool, longNames []string, shortName string
 			*target = v
 			return nil
 		},
-		isValueSet: false,
-	})
+	}
+
+	for _, opt := range options {
+		opt(f)
+	}
+
+	c.flags = append(c.flags, f)
 }
 
-func (c *Command) AddMultiBoolFlag(target *int, longNames []string, shortName string, about string) {
+func (c *Command) MultiBoolFlag(target *int, longName string, shortName string, options ...flagOption) {
 	*target = 0
 
-	c.flags = append(c.flags, &flag{
-		longNames: longNames,
-		shortName: shortName,
-		about: about,
-		requiresVal: false,
-		isRequired: false,
+	f := &flag{
+		longNames:   []string{longName},
+		shortName:   shortName,
 		setValue: func(s string) error {
 			v, err := converter.ToBool(s)
 			if err != nil {
@@ -97,17 +138,20 @@ func (c *Command) AddMultiBoolFlag(target *int, longNames []string, shortName st
 
 			return nil
 		},
-		isValueSet: false,
-	})
+	}
+
+	for _, opt := range options {
+		opt(f)
+	}
+
+	c.flags = append(c.flags, f)
 }
 
-func (c *Command) AddIntFlag(target *int, longNames []string, shortName string, about string, isRequired bool) {
-	c.flags = append(c.flags, &flag{
-		longNames: longNames,
-		shortName: shortName,
-		about: about,
+func (c *Command) IntFlag(target *int, longName string, shortName string, options ...flagOption) {
+	f := &flag{
+		longNames:   []string{longName},
+		shortName:   shortName,
 		requiresVal: true,
-		isRequired: isRequired,
 		setValue: func(s string) error {
 			v, err := converter.ToInt(s)
 			if err != nil {
@@ -117,17 +161,20 @@ func (c *Command) AddIntFlag(target *int, longNames []string, shortName string, 
 			*target = v
 			return nil
 		},
-		isValueSet: false,
-	})
+	}
+
+	for _, opt := range options {
+		opt(f)
+	}
+
+	c.flags = append(c.flags, f)
 }
 
-func (c *Command) AddMultiIntFlag(target *[]int, longNames []string, shortName string, about string) {
-	c.flags = append(c.flags, &flag{
-		longNames: longNames,
-		shortName: shortName,
-		about: about,
+func (c *Command) MultiIntFlag(target *[]int, longName string, shortName string, options ...flagOption) {
+	f := &flag{
+		longNames:   []string{longName},
+		shortName:   shortName,
 		requiresVal: true,
-		isRequired: false,
 		setValue: func(s string) error {
 			v, err := converter.ToInt(s)
 			if err != nil {
@@ -137,6 +184,11 @@ func (c *Command) AddMultiIntFlag(target *[]int, longNames []string, shortName s
 			*target = append(*target, v)
 			return nil
 		},
-		isValueSet: false,
-	})
+	}
+
+	for _, opt := range options {
+		opt(f)
+	}
+
+	c.flags = append(c.flags, f)
 }

@@ -2,6 +2,7 @@ package moon
 
 import (
 	"errors"
+	"os"
 	"strings"
 )
 
@@ -196,9 +197,51 @@ func (p *parser) parseFlags() {
 	}
 
 	for _, f := range p.flagMap {
-		if f.isRequired && !f.isValueSet {
-			err := errors.New("No value supplied for required flag: --" + f.longNames[0])
+		if !f.isValueSet {
+			p.setFromFallback(f)
+		}
+
+		if !f.isValueSet && f.isRequired {
+			err := errors.New("Missing value for required flag: " + f.longNames[0])
 			p.errors = append(p.errors, err)
+		}
+	}
+}
+
+func (p *parser) setFromFallback(f *flag) {
+	setFromEnv := func() *string {
+		if f.env == nil {
+			return nil
+		}
+
+		val := os.Getenv(*f.env)
+		if val == "" {
+			return nil
+		}
+		
+		return &val
+	}
+
+	setDefault := func() *string {
+		if f.defaultVal == nil {
+			return nil
+		}
+
+		return f.defaultVal
+	}
+
+	fallbacks := []func() *string {setFromEnv, setDefault}
+
+	for _, fallback := range fallbacks {
+		s := fallback()
+
+		if s != nil {
+			err := p.setValue(f, *s)
+			if err != nil {
+				p.errors = append(p.errors, err)
+			}
+
+			return
 		}
 	}
 }

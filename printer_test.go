@@ -24,7 +24,7 @@ func TestIntroLinePrint(t *testing.T) {
 		AboutLong: "Long About Section",
 	}
 
-	c.AddStringFlag(nil, []string{"test-flag"}, "t", "Test Flag", false)
+	c.StringFlag(nil, "test-flag", "t", About("Test Flag"))
 
 	w := CustomWriter{}
 
