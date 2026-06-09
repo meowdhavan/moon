@@ -44,7 +44,7 @@ func (m *Moon) Execute() {
 		}
 	}
 
-	if len(parser.errors) > 0 {
+	if parser.unrecognizedSubcommand || len(parser.errors) > 0 {
 		m.Printer.printFullUsage(cmd)
 		os.Exit(3)
 	}
