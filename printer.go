@@ -185,7 +185,7 @@ func (p *defaultPrinter) printFlags(c *Command) {
 
 	for cur != nil {
 		for _, f := range cur.flags {
-			fmt.Fprintf(tw, "    %s", p.Focus("--"+f.longName))
+			fmt.Fprintf(tw, "    %s", p.Focus("--"+f.name))
 
 			if f.shortName != "" {
 				fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))

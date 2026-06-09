@@ -4,198 +4,176 @@ import (
 	"github.com/meowdhavan/moon/converter"
 )
 
-type flag struct {
-	longName    string
-	aliases     []string
+type Flag struct {
+	Variable
 	shortName   string
-	about       string
 	requiresVal bool
-	setValue    func(string) error
-	isValueSet  bool
-	env         *string
-	defaultVal  *string
-	isRequired  bool
 }
 
-type flagOption func(*flag)
+func (c *Command) StringFlag(target *string, name string, shortName string, about string, options ...variableOption) {
+	f := &Flag{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToString(s)
+				if err != nil {
+					return err
+				}
 
-func Alias(alias string) flagOption {
-	return func(f *flag) {
-		f.aliases = append(f.aliases, alias)
-	}
-}
-
-func Env(env string) flagOption {
-	return func(f *flag) {
-		*f.env = env
-	}
-}
-
-func Default(defaultVal string) flagOption {
-	return func(f *flag) {
-		f.defaultVal = &defaultVal
-	}
-}
-
-func Required() flagOption {
-	return func(f *flag) {
-		f.isRequired = true
-	}
-}
-
-func (c *Command) StringFlag(target *string, longName string, shortName string, about string, options ...flagOption) {
-	f := &flag{
-		longName:    longName,
-		aliases:     []string{},
-		shortName:   shortName,
-		about:       about,
-		requiresVal: true,
-		setValue: func(s string) error {
-			v, err := converter.ToString(s)
-			if err != nil {
-				return err
-			}
-
-			*target = v
-			return nil
+				*target = v
+				return nil
+			},
 		},
+		shortName:   shortName,
+		requiresVal: true,
 	}
 
 	for _, opt := range options {
-		opt(f)
+		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) MultiStringFlag(target *[]string, longName string, shortName string, about string, options ...flagOption) {
+func (c *Command) MultiStringFlag(target *[]string, name string, shortName string, about string, options ...variableOption) {
 	*target = []string{}
 
-	f := &flag{
-		longName:    longName,
-		aliases:     []string{},
-		shortName:   shortName,
-		about:       about,
-		requiresVal: true,
-		setValue: func(s string) error {
-			v, err := converter.ToString(s)
-			if err != nil {
-				return err
-			}
+	f := &Flag{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToString(s)
+				if err != nil {
+					return err
+				}
 
-			*target = append(*target, v)
-			return nil
+				*target = append(*target, v)
+				return nil
+			},
 		},
+		shortName:   shortName,
+		requiresVal: true,
 	}
 
 	for _, opt := range options {
-		opt(f)
+		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) BoolFlag(target *bool, longName string, shortName string, about string, options ...flagOption) {
+func (c *Command) BoolFlag(target *bool, name string, shortName string, about string, options ...variableOption) {
 	*target = false
 
-	f := &flag{
-		longName:  longName,
-		aliases:   []string{},
-		shortName: shortName,
-		about:     about,
-		setValue: func(s string) error {
-			v, err := converter.ToBool(s)
-			if err != nil {
-				return err
-			}
+	f := &Flag{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToBool(s)
+				if err != nil {
+					return err
+				}
 
-			*target = v
-			return nil
+				*target = v
+				return nil
+			},
 		},
+		shortName: shortName,
 	}
 
 	for _, opt := range options {
-		opt(f)
+		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) MultiBoolFlag(target *int, longName string, shortName string, about string, options ...flagOption) {
+func (c *Command) MultiBoolFlag(target *int, name string, shortName string, about string, options ...variableOption) {
 	*target = 0
 
-	f := &flag{
-		longName:  longName,
-		aliases:   []string{},
-		shortName: shortName,
-		about:     about,
-		setValue: func(s string) error {
-			v, err := converter.ToBool(s)
-			if err != nil {
-				return err
-			}
+	f := &Flag{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToBool(s)
+				if err != nil {
+					return err
+				}
 
-			if v {
-				*target++
-			}
+				if v {
+					*target++
+				}
 
-			return nil
+				return nil
+			},
 		},
+		shortName: shortName,
 	}
 
 	for _, opt := range options {
-		opt(f)
+		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) IntFlag(target *int, longName string, shortName string, about string, options ...flagOption) {
-	f := &flag{
-		longName:  longName,
-		aliases:   []string{},
-		shortName: shortName,
-		about:     about,
+func (c *Command) IntFlag(target *int, name string, shortName string, about string, options ...variableOption) {
+	f := &Flag{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToInt(s)
+				if err != nil {
+					return err
+				}
 
-		requiresVal: true,
-		setValue: func(s string) error {
-			v, err := converter.ToInt(s)
-			if err != nil {
-				return err
-			}
-
-			*target = v
-			return nil
+				*target = v
+				return nil
+			},
 		},
-	}
-
-	for _, opt := range options {
-		opt(f)
-	}
-
-	c.flags = append(c.flags, f)
-}
-
-func (c *Command) MultiIntFlag(target *[]int, longName string, shortName string, about string, options ...flagOption) {
-	f := &flag{
-		longName:    longName,
-		aliases:     []string{},
 		shortName:   shortName,
-		about:       about,
 		requiresVal: true,
-		setValue: func(s string) error {
-			v, err := converter.ToInt(s)
-			if err != nil {
-				return err
-			}
-
-			*target = append(*target, v)
-			return nil
-		},
 	}
 
 	for _, opt := range options {
-		opt(f)
+		opt(&f.Variable)
+	}
+
+	c.flags = append(c.flags, f)
+}
+
+func (c *Command) MultiIntFlag(target *[]int, name string, shortName string, about string, options ...variableOption) {
+	f := &Flag{
+		Variable: Variable{
+			name:    name,
+			aliases: []string{},
+			about:   about,
+			setValue: func(s string) error {
+				v, err := converter.ToInt(s)
+				if err != nil {
+					return err
+				}
+
+				*target = append(*target, v)
+				return nil
+			},
+		},
+		shortName:   shortName,
+		requiresVal: true,
+	}
+
+	for _, opt := range options {
+		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)

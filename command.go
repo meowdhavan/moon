@@ -7,7 +7,7 @@ type Command struct {
 	Run        func() error
 
 	subcommands     []*Command
-	flags           []*flag
+	flags           []*Flag
 	requiredPosArgs []*posArg
 	optionalPosArgs []*posArg
 	varLenArg       *varLenArg
