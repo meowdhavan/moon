@@ -5,7 +5,7 @@ type Command struct {
 	Aliases    []string
 	AboutShort string
 	AboutLong  string
-	Run        func() error
+	Run        func()
 
 	subcommands     []*Command
 	flags           []*Flag
