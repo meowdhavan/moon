@@ -44,8 +44,26 @@ func isFlag(s string) bool {
 	return isLongFlag(s) || isShortFlag(s)
 }
 
-func (p *parser) fillFlagMap() {
-	for _, f := range p.currentCmd.flags {
+func (p *parser) clearFlagMap(flags []*Flag) {
+	for _, f := range flags {
+		if f.name != "" {
+			delete(p.flagMap, "--"+f.name)
+		}
+
+		for _, l := range f.aliases {
+			if l != "" {
+				delete(p.flagMap, "--"+l)
+			}
+		}
+
+		if f.shortName != "" {
+			delete(p.flagMap, "-"+f.shortName)
+		}
+	}
+}
+
+func (p *parser) fillFlagMap(flags []*Flag) {
+	for _, f := range flags {
 		if f.name != "" {
 			p.flagMap["--"+f.name] = f
 		}
@@ -60,6 +78,17 @@ func (p *parser) fillFlagMap() {
 			p.flagMap["-"+f.shortName] = f
 		}
 	}
+}
+
+func (p *parser) updateFlagMap() {
+	p.fillFlagMap(p.currentCmd.globalFlags.flags)
+
+	parent := p.currentCmd.parent
+	if parent != nil {
+		p.clearFlagMap(parent.localFlags.flags)
+	}
+
+	p.fillFlagMap(p.currentCmd.localFlags.flags)
 }
 
 func (p *parser) fillSubcommandsMap() {
@@ -104,7 +133,7 @@ func (p *parser) setNextTokenAsValue(f *Flag) error {
 }
 
 func (p *parser) parse() {
-	p.fillFlagMap()
+	p.updateFlagMap()
 	p.fillSubcommandsMap()
 
 	for ; p.tokenIdx < len(p.tokens); p.tokenIdx++ {
@@ -174,7 +203,7 @@ func (p *parser) parse() {
 				}
 
 				p.currentCmd = s
-				p.fillFlagMap()
+				p.updateFlagMap()
 				p.fillSubcommandsMap()
 			} else {
 				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs) { // Required PosArg

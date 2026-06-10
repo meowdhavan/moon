@@ -10,7 +10,11 @@ type Flag struct {
 	requiresVal bool
 }
 
-func (c *Command) StringFlag(target *string, name string, shortName string, about string, options ...variableOption) {
+type flagCollection struct {
+	flags []*Flag
+}
+
+func (c *flagCollection) StringFlag(target *string, name string, shortName string, about string, options ...variableOption) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -37,7 +41,7 @@ func (c *Command) StringFlag(target *string, name string, shortName string, abou
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) MultiStringFlag(target *[]string, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) MultiStringFlag(target *[]string, name string, shortName string, about string, options ...variableOption) {
 	*target = []string{}
 
 	f := &Flag{
@@ -66,7 +70,7 @@ func (c *Command) MultiStringFlag(target *[]string, name string, shortName strin
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) BoolFlag(target *bool, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) BoolFlag(target *bool, name string, shortName string, about string, options ...variableOption) {
 	*target = false
 
 	f := &Flag{
@@ -94,7 +98,7 @@ func (c *Command) BoolFlag(target *bool, name string, shortName string, about st
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) MultiBoolFlag(target *int, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) MultiBoolFlag(target *int, name string, shortName string, about string, options ...variableOption) {
 	*target = 0
 
 	f := &Flag{
@@ -125,7 +129,7 @@ func (c *Command) MultiBoolFlag(target *int, name string, shortName string, abou
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) IntFlag(target *int, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) IntFlag(target *int, name string, shortName string, about string, options ...variableOption) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -152,7 +156,7 @@ func (c *Command) IntFlag(target *int, name string, shortName string, about stri
 	c.flags = append(c.flags, f)
 }
 
-func (c *Command) MultiIntFlag(target *[]int, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) MultiIntFlag(target *[]int, name string, shortName string, about string, options ...variableOption) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,

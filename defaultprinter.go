@@ -133,21 +133,9 @@ func (p *DefaultPrinter) printUsage(c *Command) {
 
 	fmt.Fprint(p.Writer, p.getIndent())
 
-	var cur *Command
-	cur = c
+	p.printCommand(c)
 
-	commands := []string{}
-
-	for cur != nil {
-		commands = append(commands, cur.Name)
-		cur = cur.parent
-	}
-
-	slices.Reverse(commands)
-
-	fmt.Fprintf(p.Writer, "%s", strings.Join(commands, " "))
-
-	if len(c.flags) > 0 {
+	if len(c.globalFlags.flags) > 0 || len(c.localFlags.flags) > 0 {
 		fmt.Fprint(p.Writer, " [FLAGS]")
 	}
 
@@ -170,6 +158,22 @@ func (p *DefaultPrinter) printUsage(c *Command) {
 	fmt.Fprintln(p.Writer)
 }
 
+func (p *DefaultPrinter) printCommand(c *Command) {
+	var cur *Command
+	cur = c
+
+	commands := []string{}
+
+	for cur != nil {
+		commands = append(commands, cur.Name)
+		cur = cur.parent
+	}
+
+	slices.Reverse(commands)
+
+	fmt.Fprintf(p.Writer, "%s", strings.Join(commands, " "))
+}
+
 func (p *DefaultPrinter) printSubcommands(c *Command) {
 	if len(c.subcommands) == 0 {
 		return
@@ -190,37 +194,80 @@ func (p *DefaultPrinter) printSubcommands(c *Command) {
 	tw.Flush()
 }
 
+func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag, initialIndent bool) {
+	fmt.Fprint(tw, p.getIndent())
+
+	if f.shortName != "" {
+		fmt.Fprintf(tw, "%s, ", p.Focus("-"+f.shortName))
+	} else if initialIndent {
+		fmt.Fprint(tw, strings.Repeat(" ", 4))
+	}
+
+	fmt.Fprintf(tw, "%s", p.Focus("--"+f.name))
+
+	fmt.Fprintf(tw, "\t%s", f.about)
+
+	if f.isRequired {
+		fmt.Fprintf(tw, " (Required)")
+	} else if f.defaultVal != nil {
+		defaultVal := getDefault(&f.Variable)
+		fmt.Fprintf(tw, " (default %s)", *defaultVal)
+	}
+
+	if f.env != nil {
+		fmt.Fprintf(tw, " [$%s", *f.env)
+
+		envVal := getFromEnv(&f.Variable)
+		if envVal != nil {
+			fmt.Fprintf(tw, "=%s", *envVal)
+		}
+		fmt.Fprint(tw, "]")
+	}
+
+	fmt.Fprintln(tw)
+}
+
+func (p *DefaultPrinter) printFlagsUtil(flags []*Flag) {
+	initialIndent := false
+
+	for _, f := range flags {
+		if f.shortName != "" {
+			initialIndent = true
+			break
+		}
+	}
+
+	tw := tabwriter.NewWriter(p.Writer, 5, 0, 2, ' ', 0)
+
+	for _, f := range flags {
+		p.printFlagLine(tw, f, initialIndent)
+	}
+
+	tw.Flush()
+}
+
 func (p *DefaultPrinter) printFlags(c *Command) {
-	flags := []*Flag{}
+	globalFlags := []*Flag{}
 
 	var cur *Command
 	cur = c
 
 	for cur != nil {
-		flags = append(flags, cur.flags...)
+		globalFlags = append(globalFlags, cur.globalFlags.flags...)
 		cur = cur.parent
 	}
 
-	if len(flags) == 0 {
-		return
+	if len(c.localFlags.flags) > 0 {
+		fmt.Fprintln(p.Writer, p.Heading("Flags:"))
+		p.printFlagsUtil(c.localFlags.flags)
 	}
 
-	fmt.Fprintln(p.Writer, p.Heading("Flags:"))
-
-	tw := tabwriter.NewWriter(p.Writer, 5, 0, 2, ' ', 0)
-
-	for _, f := range flags {
-		fmt.Fprintf(tw, "%s%s", p.getIndent(), p.Focus("--"+f.name))
-
-		if f.shortName != "" {
-			fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))
-		} else {
-			fmt.Fprintf(tw, "\t")
+	if len(globalFlags) > 0 {
+		if len(c.localFlags.flags) > 0 {
+			fmt.Fprintln(p.Writer)
 		}
 
-		fmt.Fprintf(tw, "\t%s", f.about)
-		fmt.Fprintln(tw)
+		fmt.Fprintln(p.Writer, p.Heading("Global Flags:"))
+		p.printFlagsUtil(globalFlags)
 	}
-
-	tw.Flush()
 }
