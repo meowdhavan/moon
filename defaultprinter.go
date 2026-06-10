@@ -205,7 +205,9 @@ func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag) {
 
 	fmt.Fprintf(tw, "\t%s", f.about)
 
-	if f.defaultVal != nil {
+	if f.isRequired {
+		fmt.Fprintf(tw, " (Required)")
+	} else if f.defaultVal != nil {
 		defaultVal := getDefault(&f.Variable)
 		fmt.Fprintf(tw, " (default %s)", *defaultVal)
 	}

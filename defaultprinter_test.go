@@ -277,9 +277,11 @@ func TestFlagFallbackPrint(t *testing.T) {
 		AboutLong:  "Long About Section",
 	}
 
-	rootCmd.Flags().StringFlag(nil, "test-flag-1", "a", "Test Flag 1", Env("TEST_ENV_VAR"))
-	rootCmd.Flags().StringFlag(nil, "test-flag-2", "b", "Test Flag 2", Default("DEF"))
-	rootCmd.Flags().StringFlag(nil, "test-flag-3", "c", "Test Flag 3", Env("TEST_ENV_VAR"), Default("DEF"))
+	rootCmd.Flags().StringFlag(nil, "test-flag-1", "a", "Test Flag 1", Required())
+	rootCmd.Flags().StringFlag(nil, "test-flag-2", "b", "Test Flag 2", Env("TEST_ENV_VAR"))
+	rootCmd.Flags().StringFlag(nil, "test-flag-3", "c", "Test Flag 3", Env("TEST_ENV_VAR"), Required())
+	rootCmd.Flags().StringFlag(nil, "test-flag-4", "d", "Test Flag 4", Default("DEF"))
+	rootCmd.Flags().StringFlag(nil, "test-flag-5", "e", "Test Flag 5", Env("TEST_ENV_VAR"), Default("DEF"))
 
 	w := CustomWriter{}
 
@@ -299,9 +301,11 @@ Usage:
 app [FLAGS]
 
 Flags:
--a, --test-flag-1  Test Flag 1 [$TEST_ENV_VAR]
--b, --test-flag-2  Test Flag 2 (default DEF)
--c, --test-flag-3  Test Flag 3 (default DEF) [$TEST_ENV_VAR]
+-a, --test-flag-1  Test Flag 1 (Required)
+-b, --test-flag-2  Test Flag 2 [$TEST_ENV_VAR]
+-c, --test-flag-3  Test Flag 3 (Required) [$TEST_ENV_VAR]
+-d, --test-flag-4  Test Flag 4 (default DEF)
+-e, --test-flag-5  Test Flag 5 (default DEF) [$TEST_ENV_VAR]
 `
 
 	if got != want {
