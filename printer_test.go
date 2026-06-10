@@ -2,6 +2,7 @@ package moon
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -24,12 +25,12 @@ func TestIntroLinePrint(t *testing.T) {
 		AboutLong:  "Long About Section",
 	}
 
-	c.StringFlag(nil, "test-flag", "t", "Test Flag")
+	c.Flags().StringFlag(nil, "test-flag", "t", "Test Flag")
 
 	w := CustomWriter{}
 
 	p := DefaultPrinter{
-		Writer: &w,
+		Writer:           &w,
 		SuppressWarnings: false,
 	}
 
@@ -50,7 +51,7 @@ func TestFullHelpPrint(t *testing.T) {
 		AboutLong:  "Long About Section",
 	}
 
-	rootCmd.StringFlag(nil, "test-flag", "t", "Test Flag")
+	rootCmd.Flags().StringFlag(nil, "test-flag", "t", "Test Flag")
 	rootCmd.StringPosArg(nil, "TEST_ARG", "")
 
 	subCmd := Command{
@@ -63,7 +64,7 @@ func TestFullHelpPrint(t *testing.T) {
 	w := CustomWriter{}
 
 	p := DefaultPrinter{
-		Writer: &w,
+		Writer:           &w,
 		SuppressWarnings: false,
 	}
 
@@ -81,7 +82,7 @@ Commands:
 sub  short about subCmd
 
 Flags:
---test-flag  -t   Test Flag
+-t, --test-flag  Test Flag
 `
 
 	if got != want {
@@ -96,7 +97,7 @@ func TestIndentPrint(t *testing.T) {
 		AboutLong:  "Long About Section",
 	}
 
-	rootCmd.StringFlag(nil, "test-flag", "t", "Test Flag")
+	rootCmd.Flags().StringFlag(nil, "test-flag", "t", "Test Flag")
 	rootCmd.StringPosArg(nil, "TEST_ARG", "")
 
 	subCmd := Command{
@@ -109,9 +110,9 @@ func TestIndentPrint(t *testing.T) {
 	w := CustomWriter{}
 
 	p := DefaultPrinter{
-		Writer: &w,
+		Writer:           &w,
 		SuppressWarnings: false,
-		IndentLength: 4,
+		IndentLength:     4,
 	}
 
 	p.printHelp(&rootCmd)
@@ -128,7 +129,140 @@ Commands:
     sub  short about subCmd
 
 Flags:
-    --test-flag  -t   Test Flag
+    -t, --test-flag  Test Flag
+`
+
+	if got != want {
+		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+	}
+}
+
+func TestLocalFlagsPrint(t *testing.T) {
+	rootCmd := Command{
+		Name:       "app",
+		AboutShort: "short about for rootCmd",
+		AboutLong:  "Long About Section",
+	}
+
+	localFlagCount := 2
+
+	for i := range localFlagCount {
+		rootCmd.Flags().StringFlag(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
+	}
+
+	w := CustomWriter{}
+
+	p := DefaultPrinter{
+		Writer:           &w,
+		SuppressWarnings: false,
+	}
+
+	p.printHelp(&rootCmd)
+
+	got := w.String()
+	want := `app - short about for rootCmd
+
+Long About Section
+
+Usage:
+app [FLAGS]
+
+Flags:
+-t, --local-flag-1  Local Flag 1
+-t, --local-flag-2  Local Flag 2
+`
+
+	if got != want {
+		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+	}
+}
+
+func TestGlobalFlagsPrint(t *testing.T) {
+	rootCmd := Command{
+		Name:       "app",
+		AboutShort: "short about for rootCmd",
+		AboutLong:  "Long About Section",
+	}
+
+	globalFlagCount := 3
+
+	for i := range globalFlagCount {
+		rootCmd.GlobalFlags().StringFlag(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
+	}
+
+	w := CustomWriter{}
+
+	p := DefaultPrinter{
+		Writer:           &w,
+		SuppressWarnings: false,
+	}
+
+	p.printHelp(&rootCmd)
+
+	got := w.String()
+	want := `app - short about for rootCmd
+
+Long About Section
+
+Usage:
+app [FLAGS]
+
+Global Flags:
+-t, --global-flag-1  Global Flag 1
+-t, --global-flag-2  Global Flag 2
+-t, --global-flag-3  Global Flag 3
+`
+
+	if got != want {
+		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+	}
+}
+
+
+func TestLocalAndGlobalFlagsPrint(t *testing.T) {
+	rootCmd := Command{
+		Name:       "app",
+		AboutShort: "short about for rootCmd",
+		AboutLong:  "Long About Section",
+	}
+
+	localFlagCount := 2
+
+	for i := range localFlagCount {
+		rootCmd.Flags().StringFlag(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
+	}
+
+	globalFlagCount := 3
+
+	for i := range globalFlagCount {
+		rootCmd.GlobalFlags().StringFlag(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
+	}
+
+	w := CustomWriter{}
+
+	p := DefaultPrinter{
+		Writer:           &w,
+		SuppressWarnings: false,
+	}
+
+	p.printHelp(&rootCmd)
+
+	got := w.String()
+	want := `app - short about for rootCmd
+
+Long About Section
+
+Usage:
+app [FLAGS]
+
+Flags:
+-t, --local-flag-1  Local Flag 1
+-t, --local-flag-2  Local Flag 2
+
+Global Flags:
+-t, --global-flag-1  Global Flag 1
+-t, --global-flag-2  Global Flag 2
+-t, --global-flag-3  Global Flag 3
 `
 
 	if got != want {

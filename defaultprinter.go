@@ -133,21 +133,9 @@ func (p *DefaultPrinter) printUsage(c *Command) {
 
 	fmt.Fprint(p.Writer, p.getIndent())
 
-	var cur *Command
-	cur = c
+	p.printCommand(c)
 
-	commands := []string{}
-
-	for cur != nil {
-		commands = append(commands, cur.Name)
-		cur = cur.parent
-	}
-
-	slices.Reverse(commands)
-
-	fmt.Fprintf(p.Writer, "%s", strings.Join(commands, " "))
-
-	if len(c.flags) > 0 {
+	if len(c.globalFlags.flags) > 0 || len(c.localFlags.flags) > 0 {
 		fmt.Fprint(p.Writer, " [FLAGS]")
 	}
 
@@ -170,6 +158,22 @@ func (p *DefaultPrinter) printUsage(c *Command) {
 	fmt.Fprintln(p.Writer)
 }
 
+func (p *DefaultPrinter) printCommand(c *Command) {
+	var cur *Command
+	cur = c
+
+	commands := []string{}
+
+	for cur != nil {
+		commands = append(commands, cur.Name)
+		cur = cur.parent
+	}
+
+	slices.Reverse(commands)
+
+	fmt.Fprintf(p.Writer, "%s", strings.Join(commands, " "))
+}
+
 func (p *DefaultPrinter) printSubcommands(c *Command) {
 	if len(c.subcommands) == 0 {
 		return
@@ -190,37 +194,47 @@ func (p *DefaultPrinter) printSubcommands(c *Command) {
 	tw.Flush()
 }
 
-func (p *DefaultPrinter) printFlags(c *Command) {
-	flags := []*Flag{}
-
-	var cur *Command
-	cur = c
-
-	for cur != nil {
-		flags = append(flags, cur.flags...)
-		cur = cur.parent
-	}
-
-	if len(flags) == 0 {
-		return
-	}
-
-	fmt.Fprintln(p.Writer, p.Heading("Flags:"))
-
+func (p *DefaultPrinter) printFlagsUtil(flags []*Flag) {
 	tw := tabwriter.NewWriter(p.Writer, 5, 0, 2, ' ', 0)
 
 	for _, f := range flags {
-		fmt.Fprintf(tw, "%s%s", p.getIndent(), p.Focus("--"+f.name))
+		fmt.Fprint(tw, p.getIndent())
 
 		if f.shortName != "" {
-			fmt.Fprintf(tw, "\t%s", p.Focus("-"+f.shortName))
-		} else {
-			fmt.Fprintf(tw, "\t")
+			fmt.Fprintf(tw, "%s, ", p.Focus("-"+f.shortName))
 		}
+
+		fmt.Fprintf(tw, "%s", p.Focus("--"+f.name))
 
 		fmt.Fprintf(tw, "\t%s", f.about)
 		fmt.Fprintln(tw)
 	}
 
 	tw.Flush()
+}
+
+func (p *DefaultPrinter) printFlags(c *Command) {
+	globalFlags := []*Flag{}
+
+	var cur *Command
+	cur = c
+
+	for cur != nil {
+		globalFlags = append(globalFlags, cur.globalFlags.flags...)
+		cur = cur.parent
+	}
+
+	if len(c.localFlags.flags) > 0 {
+		fmt.Fprintln(p.Writer, p.Heading("Flags:"))
+		p.printFlagsUtil(c.localFlags.flags)
+	}
+
+	if len(globalFlags) > 0 {
+		if len(c.localFlags.flags) > 0 {
+			fmt.Fprintln(p.Writer)
+		}
+
+		fmt.Fprintln(p.Writer, p.Heading("Global Flags:"))
+		p.printFlagsUtil(globalFlags)
+	}
 }
