@@ -167,8 +167,8 @@ func (p *parser) parse() {
 
 				s, found := p.subcommandsMap[token]
 				if !found {
-					warning := errors.New("Unrecognized subcommand: " + token)
-					p.warnings = append(p.warnings, warning)
+					err := errors.New("Unrecognized subcommand: " + token)
+					p.errors = append(p.warnings, err)
 					p.unrecognizedSubcommand = true
 					continue
 				}
