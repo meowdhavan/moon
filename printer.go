@@ -54,7 +54,7 @@ func (p *defaultPrinter) printErrors(errors *[]error) {
 }
 
 func (p *defaultPrinter) printWarnings(warnings *[]error) {
-	if len(*warnings) == 0 {
+	if p.suppressWarnings || len(*warnings) == 0 {
 		return
 	}
 
