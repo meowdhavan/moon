@@ -4,16 +4,32 @@ import "os"
 
 type Moon struct {
 	rootCmd *Command
-	Printer Printer
+	printer Printer
 }
 
-func NewMoon(rootCmd *Command) *Moon {
-	p := NewDefaultPrinter(os.Stdout, false)
+type moonOption func(*Moon)
 
-	return &Moon{
-		rootCmd: rootCmd,
-		Printer: &p,
+func WithPrinter(p Printer) moonOption {
+	return func(m *Moon) {
+		m.printer = p
 	}
+}
+
+func NewMoon(rootCmd *Command, options ...moonOption) *Moon {
+	m := &Moon{
+		rootCmd: rootCmd,
+	}
+
+	for _, opt:= range options {
+		opt(m)
+	}
+
+	if m.printer == nil {
+		p := NewDefaultPrinter(os.Stdout, false)
+		m.printer = &p
+	}
+
+	return m
 }
 
 func (m *Moon) Execute() {
@@ -27,12 +43,12 @@ func (m *Moon) Execute() {
 	cmd := parser.currentCmd
 
 	if !parser.unrecognizedSubcommand && (showHelp || cmd.Run == nil) {
-		m.Printer.printHelp(cmd)
+		m.printer.printHelp(cmd)
 		os.Exit(0)
 	}
 
 	if parser.unrecognizedSubcommand || len(parser.errors) > 0 {
-		m.Printer.printFullUsage(cmd, &parser.errors, &parser.warnings)
+		m.printer.printFullUsage(cmd, &parser.errors, &parser.warnings)
 		os.Exit(3)
 	}
 
