@@ -40,7 +40,7 @@ func TestIntroLinePrint(t *testing.T) {
 	want := "app - short about\n"
 
 	if got != want {
-		t.Errorf("Intro Line mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Intro Line Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
 
@@ -86,7 +86,7 @@ Flags:
 `
 
 	if got != want {
-		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Full Help Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
 
@@ -133,7 +133,7 @@ Flags:
 `
 
 	if got != want {
-		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Indent Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
 
@@ -173,7 +173,43 @@ Flags:
 `
 
 	if got != want {
-		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Local Flags Print mismatch; got='%s', want='%s'", got, want)
+	}
+}
+
+func TestInitialIndentPrint(t *testing.T) {
+	rootCmd := Command{
+		Name:       "app",
+		AboutShort: "short about for rootCmd",
+	}
+
+	rootCmd.Flags().StringFlag(nil, "local-flag-1", "", "Local Flag 1")
+	rootCmd.Flags().StringFlag(nil, "local-flag-2", "", "Local Flag 2")
+	rootCmd.Flags().StringFlag(nil, "local-flag-3", "", "Local Flag 3")
+
+	w := CustomWriter{}
+
+	p := DefaultPrinter{
+		Writer:           &w,
+		SuppressWarnings: false,
+	}
+
+	p.printHelp(&rootCmd)
+
+	got := w.String()
+	want := `app - short about for rootCmd
+
+Usage:
+app [FLAGS]
+
+Flags:
+--local-flag-1  Local Flag 1
+--local-flag-2  Local Flag 2
+--local-flag-3  Local Flag 3
+`
+
+	if got != want {
+		t.Errorf("Initial Indent Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
 
@@ -214,7 +250,7 @@ Global Flags:
 `
 
 	if got != want {
-		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Global Flags Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
 
@@ -266,7 +302,7 @@ Global Flags:
 `
 
 	if got != want {
-		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Local and Global Flags Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
 
@@ -309,6 +345,6 @@ Flags:
 `
 
 	if got != want {
-		t.Errorf("Full Help mismatch; got='%s', want='%s'", got, want)
+		t.Errorf("Flag Fallback Print mismatch; got='%s', want='%s'", got, want)
 	}
 }

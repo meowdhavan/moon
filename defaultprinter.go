@@ -194,11 +194,13 @@ func (p *DefaultPrinter) printSubcommands(c *Command) {
 	tw.Flush()
 }
 
-func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag) {
+func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag, initialIndent bool) {
 	fmt.Fprint(tw, p.getIndent())
 
 	if f.shortName != "" {
 		fmt.Fprintf(tw, "%s, ", p.Focus("-"+f.shortName))
+	} else if initialIndent {
+		fmt.Fprint(tw, strings.Repeat(" ", 4))
 	}
 
 	fmt.Fprintf(tw, "%s", p.Focus("--"+f.name))
@@ -226,10 +228,19 @@ func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag) {
 }
 
 func (p *DefaultPrinter) printFlagsUtil(flags []*Flag) {
+	initialIndent := false
+
+	for _, f := range flags {
+		if f.shortName != "" {
+			initialIndent = true
+			break
+		}
+	}
+
 	tw := tabwriter.NewWriter(p.Writer, 5, 0, 2, ' ', 0)
 
 	for _, f := range flags {
-		p.printFlagLine(tw, f)
+		p.printFlagLine(tw, f, initialIndent)
 	}
 
 	tw.Flush()
