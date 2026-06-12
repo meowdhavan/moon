@@ -248,21 +248,39 @@ func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag, initialInd
 
 	fmt.Fprintf(tw, "\t%s", f.about)
 
+	helpers := []string{}
+
 	if f.isRequired {
-		fmt.Fprintf(tw, " (Required)")
+		helpers = append(helpers, "[required]")
 	} else if f.defaultVal != nil {
 		defaultVal := getDefault(&f.Variable)
-		fmt.Fprintf(tw, " (default %s)", *defaultVal)
+		helpers = append(helpers, fmt.Sprintf("[default: %s]", *defaultVal))
 	}
 
 	if f.env != nil {
-		fmt.Fprintf(tw, " [$%s", *f.env)
+		var b strings.Builder
+
+		b.WriteString("[env: ")
+		b.WriteString(*f.env)
 
 		envVal := getFromEnv(&f.Variable)
 		if envVal != nil {
-			fmt.Fprintf(tw, "=%s", *envVal)
+			b.WriteString("=")
+			b.WriteString(*envVal)
 		}
-		fmt.Fprint(tw, "]")
+
+		b.WriteString("]")
+		helpers = append(helpers, b.String())
+	}
+
+	if len(f.aliases) > 0 {
+		helpers = append(helpers, fmt.Sprintf("[aliases: %s]", strings.Join(f.aliases, ", ")))
+	}
+
+	if len(helpers) > 0 {
+		helperSep := " "
+
+		fmt.Fprintf(tw, " %s", strings.Join(helpers, helperSep))
 	}
 
 	fmt.Fprintln(tw)

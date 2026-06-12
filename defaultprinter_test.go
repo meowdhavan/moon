@@ -292,11 +292,11 @@ Usage:
 app [FLAGS]
 
 Flags:
--a, --test-flag-1  Test Flag 1 (Required)
--b, --test-flag-2  Test Flag 2 [$TEST_ENV_VAR]
--c, --test-flag-3  Test Flag 3 (Required) [$TEST_ENV_VAR]
--d, --test-flag-4  Test Flag 4 (default DEF)
--e, --test-flag-5  Test Flag 5 (default DEF) [$TEST_ENV_VAR]
+-a, --test-flag-1  Test Flag 1 [required]
+-b, --test-flag-2  Test Flag 2 [env: TEST_ENV_VAR]
+-c, --test-flag-3  Test Flag 3 [required] [env: TEST_ENV_VAR]
+-d, --test-flag-4  Test Flag 4 [default: DEF]
+-e, --test-flag-5  Test Flag 5 [default: DEF] [env: TEST_ENV_VAR]
 `
 
 	if got != want {
