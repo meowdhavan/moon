@@ -1,22 +1,9 @@
 package moon
 
 import (
-	"bytes"
 	"fmt"
 	"testing"
 )
-
-type CustomWriter struct {
-	buf bytes.Buffer
-}
-
-func (c *CustomWriter) Write(p []byte) (n int, err error) {
-	return c.buf.Write(p)
-}
-
-func (c *CustomWriter) String() string {
-	return c.buf.String()
-}
 
 func TestIntroLinePrint(t *testing.T) {
 	c := Command{
@@ -27,16 +14,13 @@ func TestIntroLinePrint(t *testing.T) {
 
 	c.Flags().StringFlag(nil, "test-flag", "t", "Test Flag")
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
+		HelperMaxLength:  80,
 	}
 
-	p.printIntroLine(&c)
+	got := p.printIntroLine(&c)
 
-	got := w.String()
 	want := "app - short about\n"
 
 	if got != want {
@@ -61,16 +45,13 @@ func TestFullHelpPrint(t *testing.T) {
 
 	rootCmd.Subcommand(&subCmd)
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
+		HelperMaxLength:  80,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Long About Section
@@ -107,17 +88,14 @@ func TestIndentPrint(t *testing.T) {
 
 	rootCmd.Subcommand(&subCmd)
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
 		IndentLength:     4,
+		HelperMaxLength:  80,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Long About Section
@@ -150,16 +128,13 @@ func TestLocalFlagsPrint(t *testing.T) {
 		rootCmd.Flags().StringFlag(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
 	}
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
+		HelperMaxLength:  80,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Long About Section
@@ -187,16 +162,12 @@ func TestInitialIndentPrint(t *testing.T) {
 	rootCmd.Flags().StringFlag(nil, "local-flag-2", "", "Local Flag 2")
 	rootCmd.Flags().StringFlag(nil, "local-flag-3", "", "Local Flag 3")
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Usage:
@@ -226,16 +197,13 @@ func TestGlobalFlagsPrint(t *testing.T) {
 		rootCmd.GlobalFlags().StringFlag(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
 	}
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
+		HelperMaxLength:  80,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Long About Section
@@ -253,7 +221,6 @@ Global Flags:
 		t.Errorf("Global Flags Print mismatch; got='%s', want='%s'", got, want)
 	}
 }
-
 
 func TestLocalAndGlobalFlagsPrint(t *testing.T) {
 	rootCmd := Command{
@@ -274,16 +241,13 @@ func TestLocalAndGlobalFlagsPrint(t *testing.T) {
 		rootCmd.GlobalFlags().StringFlag(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
 	}
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
+		HelperMaxLength:  80,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Long About Section
@@ -319,16 +283,13 @@ func TestFlagFallbackPrint(t *testing.T) {
 	rootCmd.Flags().StringFlag(nil, "test-flag-4", "d", "Test Flag 4", Default("DEF"))
 	rootCmd.Flags().StringFlag(nil, "test-flag-5", "e", "Test Flag 5", Env("TEST_ENV_VAR"), Default("DEF"))
 
-	w := CustomWriter{}
-
 	p := DefaultPrinter{
-		Writer:           &w,
 		SuppressWarnings: false,
+		HelperMaxLength:  80,
 	}
 
-	p.printHelp(&rootCmd)
+	got := p.printHelp(&rootCmd)
 
-	got := w.String()
 	want := `app - short about for rootCmd
 
 Long About Section
@@ -337,11 +298,11 @@ Usage:
 app [FLAGS]
 
 Flags:
--a, --test-flag-1  Test Flag 1 (Required)
--b, --test-flag-2  Test Flag 2 [$TEST_ENV_VAR]
--c, --test-flag-3  Test Flag 3 (Required) [$TEST_ENV_VAR]
--d, --test-flag-4  Test Flag 4 (default DEF)
--e, --test-flag-5  Test Flag 5 (default DEF) [$TEST_ENV_VAR]
+-a, --test-flag-1  Test Flag 1 [required]
+-b, --test-flag-2  Test Flag 2 [env: TEST_ENV_VAR]
+-c, --test-flag-3  Test Flag 3 [required] [env: TEST_ENV_VAR]
+-d, --test-flag-4  Test Flag 4 [default: DEF]
+-e, --test-flag-5  Test Flag 5 [default: DEF] [env: TEST_ENV_VAR]
 `
 
 	if got != want {

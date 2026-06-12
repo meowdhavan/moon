@@ -1,7 +1,7 @@
 package moon
 
 type Printer interface {
-	printHelp(*Command)
-	printWarnings(*[]error)
-	printFullUsage(*Command, *[]error, *[]error)
+	printHelp(*Command) string
+	printWarnings(*[]error) string
+	printFullUsage(*Command, *[]error, *[]error) string
 }

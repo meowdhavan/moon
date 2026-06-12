@@ -1,6 +1,9 @@
 package moon
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 type Moon struct {
 	RootCmd *Command
@@ -9,10 +12,10 @@ type Moon struct {
 
 func NewMoon(rootCmd *Command) *Moon {
 	p := DefaultPrinter{
-		Writer:           os.Stdout,
 		SuppressWarnings: false,
 		IndentLength:     4,
 		HeadingStyle:     []Style{StyleUnderline},
+		HelperMaxLength:  80,
 	}
 
 	m := &Moon{
@@ -34,17 +37,17 @@ func (m *Moon) Execute() {
 	cmd := p.currentCmd
 
 	if !p.unrecognizedSubcommand && (showHelp || cmd.Run == nil) {
-		m.Printer.printHelp(cmd)
+		fmt.Print(m.Printer.printHelp(cmd))
 		os.Exit(0)
 	}
 
 	if len(p.errors) > 0 {
-		m.Printer.printFullUsage(cmd, &p.errors, &p.warnings)
+		fmt.Print(m.Printer.printFullUsage(cmd, &p.errors, &p.warnings))
 		os.Exit(3)
 	}
 
 	if len(p.warnings) > 0 {
-		m.Printer.printWarnings(&p.warnings)
+		fmt.Print(m.Printer.printWarnings(&p.warnings))
 	}
 
 	cmd.Run()
