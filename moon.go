@@ -52,3 +52,25 @@ func (m *Moon) Execute() {
 
 	cmd.Run()
 }
+
+func (m *Moon) Validate() []error {
+	errors := []error{}
+
+	commands := []*Command{m.RootCmd}
+
+	for len(commands) > 0 {
+		c := commands[0]
+		commands = commands[1:]
+
+		// If c was seen before, add error
+
+		// Check Flags
+		// Check Subcommands
+
+		for _, sub := range c.subcommands {
+			commands = append(commands, sub)
+		}
+	}
+
+	return errors
+}
