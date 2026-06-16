@@ -10,19 +10,27 @@ type Command struct {
 	subcommands     []*Command
 	localFlags      flagCollection
 	globalFlags     flagCollection
-	requiredPosArgs []*PosArg
-	optionalPosArgs []*PosArg
+	requiredPosArgs posArgCollection
+	optionalPosArgs posArgCollection
 	varLenArg       *VarLenArg
 
 	parent *Command
+}
+
+func (c *Command) Flags() *flagCollection {
+	return &c.localFlags
 }
 
 func (c *Command) GlobalFlags() *flagCollection {
 	return &c.globalFlags
 }
 
-func (c *Command) Flags() *flagCollection {
-	return &c.localFlags
+func (c *Command) RequiredPosArgs() *posArgCollection {
+	return &c.requiredPosArgs
+}
+
+func (c *Command) OptionalPosArgs() *posArgCollection {
+	return &c.optionalPosArgs
 }
 
 func (c *Command) Subcommand(s *Command) {

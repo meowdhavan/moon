@@ -6,16 +6,16 @@ import (
 )
 
 type parser struct {
-	tokens            []string
-	tokenIdx          int
-	flagMap           map[string]*Flag
-	subcommandsMap    map[string]*Command
-	currentCmd        *Command
-	requiredPosArgIdx int
-	optionalPosArgIdx int
-	errors            []error
-	warnings          []error
-	unrecognizedSubcommand         bool
+	tokens                 []string
+	tokenIdx               int
+	flagMap                map[string]*Flag
+	subcommandsMap         map[string]*Command
+	currentCmd             *Command
+	requiredPosArgIdx      int
+	optionalPosArgIdx      int
+	errors                 []error
+	warnings               []error
+	unrecognizedSubcommand bool
 }
 
 func newParser(rootCmd *Command, tokens []string) parser {
@@ -206,16 +206,16 @@ func (p *parser) parse() {
 				p.updateFlagMap()
 				p.fillSubcommandsMap()
 			} else {
-				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs) { // Required PosArg
-					a := p.currentCmd.requiredPosArgs[p.requiredPosArgIdx]
+				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs.posArgs) { // Required PosArg
+					a := p.currentCmd.requiredPosArgs.posArgs[p.requiredPosArgIdx]
 					err := a.setValue(token)
 					if err != nil {
 						p.errors = append(p.errors, err)
 					}
 
 					p.requiredPosArgIdx++
-				} else if p.optionalPosArgIdx < len(p.currentCmd.optionalPosArgs) { // Optional PosArg
-					a := p.currentCmd.optionalPosArgs[p.optionalPosArgIdx]
+				} else if p.optionalPosArgIdx < len(p.currentCmd.optionalPosArgs.posArgs) { // Optional PosArg
+					a := p.currentCmd.optionalPosArgs.posArgs[p.optionalPosArgIdx]
 					err := a.setValue(token)
 					if err != nil {
 						p.errors = append(p.errors, err)
@@ -246,7 +246,7 @@ func (p *parser) parse() {
 		}
 	}
 
-	for _, a := range p.currentCmd.optionalPosArgs[p.optionalPosArgIdx:] {
+	for _, a := range p.currentCmd.optionalPosArgs.posArgs[p.optionalPosArgIdx:] {
 		p.setFromFallbacks(&a.Variable)
 	}
 }

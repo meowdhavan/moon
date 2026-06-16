@@ -6,11 +6,15 @@ type PosArg struct {
 	Variable
 }
 
+type posArgCollection struct {
+	posArgs []*PosArg
+}
+
 type VarLenArg struct {
 	Variable
 }
 
-func (c *Command) StringPosArg(target *string, name string, about string, options ...variableOption) {
+func (c *posArgCollection) String(target *string, name string, about string, options ...variableOption) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -32,11 +36,7 @@ func (c *Command) StringPosArg(target *string, name string, about string, option
 		opt(&posArg.Variable)
 	}
 
-	if posArg.isRequired {
-		c.requiredPosArgs = append(c.requiredPosArgs, posArg)
-	} else {
-		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
-	}
+	c.posArgs = append(c.posArgs, posArg)
 }
 
 func (c *Command) StringVarLenArg(target *[]string, name string, about string, options ...variableOption) {
@@ -66,7 +66,7 @@ func (c *Command) StringVarLenArg(target *[]string, name string, about string, o
 	c.varLenArg = v
 }
 
-func (c *Command) BoolPosArg(target *bool, name string, about string, options ...variableOption) {
+func (c *posArgCollection) Bool(target *bool, name string, about string, options ...variableOption) {
 	*target = false
 
 	posArg := &PosArg{
@@ -90,14 +90,10 @@ func (c *Command) BoolPosArg(target *bool, name string, about string, options ..
 		opt(&posArg.Variable)
 	}
 
-	if posArg.isRequired {
-		c.requiredPosArgs = append(c.requiredPosArgs, posArg)
-	} else {
-		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
-	}
+	c.posArgs = append(c.posArgs, posArg)
 }
 
-func (c *Command) IntPosArg(target *int, name string, about string, options ...variableOption) {
+func (c *posArgCollection) Int(target *int, name string, about string, options ...variableOption) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -119,11 +115,7 @@ func (c *Command) IntPosArg(target *int, name string, about string, options ...v
 		opt(&posArg.Variable)
 	}
 
-	if posArg.isRequired {
-		c.requiredPosArgs = append(c.requiredPosArgs, posArg)
-	} else {
-		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
-	}
+	c.posArgs = append(c.posArgs, posArg)
 }
 
 func (c *Command) IntVarLenArg(target *[]int, name string, about string, options ...variableOption) {
