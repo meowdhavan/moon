@@ -1,4 +1,9 @@
-# Moon
+<div align="center">
+  <h1>Moon</h1>
+
+  [![Docker Image CI](https://github.com/meowdhavan/moon/actions/workflows/go-test.yml/badge.svg)](https://github.com/meowdhavan/moon/actions)
+
+</div>
 
 A minimal POSIX-compliant command-line parser for Go. **Moon** lets you design CLI applications with support for flags, subcommands, positional arguments, and help generation.
 
