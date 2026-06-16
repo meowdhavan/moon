@@ -36,7 +36,7 @@ func TestFullHelpPrint(t *testing.T) {
 	}
 
 	rootCmd.Flags().String(nil, "test-flag", "t", "Test Flag")
-	rootCmd.OptionalPosArgs().String(nil, "TEST_ARG", "")
+	rootCmd.PosArgs().String(nil, "TEST_ARG", "")
 
 	subCmd := Command{
 		Name:       "sub",
@@ -79,7 +79,7 @@ func TestIndentPrint(t *testing.T) {
 	}
 
 	rootCmd.Flags().String(nil, "test-flag", "t", "Test Flag")
-	rootCmd.OptionalPosArgs().String(nil, "TEST_ARG", "")
+	rootCmd.PosArgs().String(nil, "TEST_ARG", "")
 
 	subCmd := Command{
 		Name:       "sub",

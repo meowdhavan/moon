@@ -206,16 +206,16 @@ func (p *parser) parse() {
 				p.updateFlagMap()
 				p.fillSubcommandsMap()
 			} else {
-				if p.requiredPosArgIdx < len(p.currentCmd.requiredPosArgs.posArgs) { // Required PosArg
-					a := p.currentCmd.requiredPosArgs.posArgs[p.requiredPosArgIdx]
+				if p.requiredPosArgIdx < len(p.currentCmd.posArgs.requiredPosArgs) { // Required PosArg
+					a := p.currentCmd.posArgs.requiredPosArgs[p.requiredPosArgIdx]
 					err := a.setValue(token)
 					if err != nil {
 						p.errors = append(p.errors, err)
 					}
 
 					p.requiredPosArgIdx++
-				} else if p.optionalPosArgIdx < len(p.currentCmd.optionalPosArgs.posArgs) { // Optional PosArg
-					a := p.currentCmd.optionalPosArgs.posArgs[p.optionalPosArgIdx]
+				} else if p.optionalPosArgIdx < len(p.currentCmd.posArgs.optionalPosArgs) { // Optional PosArg
+					a := p.currentCmd.posArgs.optionalPosArgs[p.optionalPosArgIdx]
 					err := a.setValue(token)
 					if err != nil {
 						p.errors = append(p.errors, err)
@@ -246,7 +246,7 @@ func (p *parser) parse() {
 		}
 	}
 
-	for _, a := range p.currentCmd.optionalPosArgs.posArgs[p.optionalPosArgIdx:] {
+	for _, a := range p.currentCmd.posArgs.optionalPosArgs[p.optionalPosArgIdx:] {
 		p.setFromFallbacks(&a.Variable)
 	}
 }

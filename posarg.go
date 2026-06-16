@@ -7,7 +7,8 @@ type PosArg struct {
 }
 
 type posArgCollection struct {
-	posArgs []*PosArg
+	requiredPosArgs []*PosArg
+	optionalPosArgs []*PosArg
 }
 
 func (c *posArgCollection) String(target *string, name string, about string, options ...variableOption) {
@@ -32,7 +33,11 @@ func (c *posArgCollection) String(target *string, name string, about string, opt
 		opt(&posArg.Variable)
 	}
 
-	c.posArgs = append(c.posArgs, posArg)
+	if posArg.isRequired {
+		c.requiredPosArgs = append(c.requiredPosArgs, posArg)
+	} else {
+		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
+	}
 }
 
 func (c *posArgCollection) Bool(target *bool, name string, about string, options ...variableOption) {
@@ -59,7 +64,11 @@ func (c *posArgCollection) Bool(target *bool, name string, about string, options
 		opt(&posArg.Variable)
 	}
 
-	c.posArgs = append(c.posArgs, posArg)
+	if posArg.isRequired {
+		c.requiredPosArgs = append(c.requiredPosArgs, posArg)
+	} else {
+		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
+	}
 }
 
 func (c *posArgCollection) Int(target *int, name string, about string, options ...variableOption) {
@@ -84,5 +93,9 @@ func (c *posArgCollection) Int(target *int, name string, about string, options .
 		opt(&posArg.Variable)
 	}
 
-	c.posArgs = append(c.posArgs, posArg)
+	if posArg.isRequired {
+		c.requiredPosArgs = append(c.requiredPosArgs, posArg)
+	} else {
+		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
+	}
 }

@@ -168,13 +168,13 @@ func (p *DefaultPrinter) printUsage(c *Command) string {
 	if len(c.subcommands) > 0 {
 		b.WriteString(" <COMMAND>")
 	} else {
-		for _, a := range c.requiredPosArgs.posArgs {
+		for _, a := range c.posArgs.requiredPosArgs {
 			b.WriteString(" <")
 			b.WriteString(a.name)
 			b.WriteString(">")
 		}
 
-		for _, a := range c.optionalPosArgs.posArgs {
+		for _, a := range c.posArgs.optionalPosArgs {
 			b.WriteString(" <")
 			b.WriteString(a.name)
 			b.WriteString(">")
