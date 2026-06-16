@@ -85,7 +85,7 @@ func TestMultitypePosArgParse(t *testing.T) {
 	c := Command{}
 	c.RequiredPosArgs().String(&targetA, "a", "", Required())
 	c.OptionalPosArgs().Int(&targetB, "b", "")
-	c.IntVarLenArg(&targetSlice, "vla", "")
+	c.VarArgs().Int(&targetSlice, "vla", "")
 
 	p := newParser(&c, []string{"app", "target_value_1", "123", "10", "20", "30"})
 	p.parse()

@@ -10,8 +10,12 @@ type posArgCollection struct {
 	posArgs []*PosArg
 }
 
-type VarLenArg struct {
+type VarArgs struct {
 	Variable
+}
+
+type varArgs struct {
+	varArg *VarArgs
 }
 
 func (c *posArgCollection) String(target *string, name string, about string, options ...variableOption) {
@@ -39,10 +43,10 @@ func (c *posArgCollection) String(target *string, name string, about string, opt
 	c.posArgs = append(c.posArgs, posArg)
 }
 
-func (c *Command) StringVarLenArg(target *[]string, name string, about string, options ...variableOption) {
+func (a *varArgs) String(target *[]string, name string, about string, options ...variableOption) {
 	*target = []string{}
 
-	v := &VarLenArg{
+	v := &VarArgs{
 		Variable: Variable{
 			name:    name,
 			aliases: []string{},
@@ -63,7 +67,7 @@ func (c *Command) StringVarLenArg(target *[]string, name string, about string, o
 		opt(&v.Variable)
 	}
 
-	c.varLenArg = v
+	a.varArg = v
 }
 
 func (c *posArgCollection) Bool(target *bool, name string, about string, options ...variableOption) {
@@ -118,10 +122,10 @@ func (c *posArgCollection) Int(target *int, name string, about string, options .
 	c.posArgs = append(c.posArgs, posArg)
 }
 
-func (c *Command) IntVarLenArg(target *[]int, name string, about string, options ...variableOption) {
+func (a *varArgs) Int(target *[]int, name string, about string, options ...variableOption) {
 	*target = []int{}
 
-	v := &VarLenArg{
+	v := &VarArgs{
 		Variable: Variable{
 			name:    name,
 			aliases: []string{},
@@ -142,5 +146,5 @@ func (c *Command) IntVarLenArg(target *[]int, name string, about string, options
 		opt(&v.Variable)
 	}
 
-	c.varLenArg = v
+	a.varArg = v
 }

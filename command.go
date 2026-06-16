@@ -12,7 +12,7 @@ type Command struct {
 	globalFlags     flagCollection
 	requiredPosArgs posArgCollection
 	optionalPosArgs posArgCollection
-	varLenArg       *VarLenArg
+	varArgs         varArgs
 
 	parent *Command
 }
@@ -31,6 +31,10 @@ func (c *Command) RequiredPosArgs() *posArgCollection {
 
 func (c *Command) OptionalPosArgs() *posArgCollection {
 	return &c.optionalPosArgs
+}
+
+func (c *Command) VarArgs() *varArgs {
+	return &c.varArgs
 }
 
 func (c *Command) Subcommand(s *Command) {

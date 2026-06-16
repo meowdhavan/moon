@@ -223,7 +223,7 @@ func (p *parser) parse() {
 
 					p.optionalPosArgIdx++
 				} else { // VarLenArg
-					v := p.currentCmd.varLenArg
+					v := p.currentCmd.varArgs.varArg
 					if v == nil {
 						warning := errors.New("Unrecognized argument: " + token)
 						p.warnings = append(p.warnings, warning)

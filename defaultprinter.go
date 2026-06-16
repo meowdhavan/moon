@@ -180,9 +180,9 @@ func (p *DefaultPrinter) printUsage(c *Command) string {
 			b.WriteString(">")
 		}
 
-		if c.varLenArg != nil {
+		if c.varArgs.varArg != nil {
 			b.WriteString(" <...")
-			b.WriteString(c.varLenArg.name)
+			b.WriteString(c.varArgs.varArg.name)
 			b.WriteString(">")
 		}
 	}
