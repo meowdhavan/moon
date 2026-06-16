@@ -1,1 +1,136 @@
-# moon
+# Moon
+
+A minimal POSIX-compliant command-line parser for Go. **Moon** lets you design CLI applications with support for flags, subcommands, positional arguments, and help generation.
+
+## Installation
+
+**Moon** can be added to any Go project using the `go get` command.
+
+```bash
+go get github.com/meowdhavan/moon
+```
+
+## Usage
+
+**Moon** is inspired by Cobra, and many of their commands will look similar.
+
+### Example
+
+It is recommended to define the commands in their own dedicated package (`cmd`, by convention):
+
+```go
+package cmd
+
+import (
+	"fmt"
+	"github.com/meowdhavan/moon"
+)
+
+var (
+	name    string
+	age     int
+	verbose bool
+	files   []string
+)
+
+RootCmd := &moon.Command{
+	Name:       "greet",
+	AboutShort: "A simple CLI application to greet people.",
+	Run: func() {
+		fmt.Printf("Hello %s, you are %d years old.\n", name, age)
+		fmt.Printf("Processing %d files.\n", len(files))
+	},
+}
+
+func init() {
+	RootCmd.Flags().String(&name, "name", "n", "Your name", moon.Env("GREET_NAME"), moon.Required())
+	RootCmd.Flags().Int(&age, "age", "a", "Your age", moon.Default("18"))
+
+	RootCmd.StringVarLenArg(&files, "files", "List of files to process")
+}
+```
+
+...and execute the application within `main()`:
+
+```go
+package main
+
+import "cmd"
+
+func main() {
+	m := moon.NewMoon(cmd.RootCmd)
+	m.Execute()
+}
+```
+
+### Running the Example
+
+Print the auto-generated help:
+```bash
+go run main.go --help
+```
+
+Run with flags:
+```bash
+go run main.go --name Alice --age 25 file1.txt file2.txt
+```
+
+Use short flags and default values:
+```bash
+go run main.go -n Bob
+```
+
+## Advanced Usage
+
+### Options
+
+When defining flags or positional arguments, you can pass optional modifiers to customize their behavior:
+
+- `moon.Alias("alias_name")`: Sets an alias for the flag.
+- `moon.Env("ENV_VAR")`: Falls back to reading from an environment variable.
+- `moon.Default("value")`: Sets a default value if the flag is not provided. Due to current limitations, the provided value must be a `string`, irrespective of the type of the flag/argument.
+- `moon.Required()`: Marks the flag or argument as required. If no value is provided and no fallback is available, an error is thrown.
+
+### Subcommands
+
+Subcommands are just like any other command. They must be attached to their parent with the `Subcommand()` method.
+
+```go
+srvCmd := &moon.Command{
+	Name:       "serve",
+	AboutShort: "Start the server",
+	Run: func() {
+		fmt.Println("Starting server...")
+	},
+}
+
+var port int
+
+func init() {
+	srvCmd.Flags().Int(&port, "port", "p", "PORT", moon.Env("SERVER_PORT"), moon.Required())
+
+	rootCmd.Subcommand(srvCmd)
+}
+```
+
+### Supported Types
+
+**Flags:**
+- `StringFlag`, `IntFlag`, `BoolFlag`
+- `MultiStringFlag`, `MultiIntFlag`, `MultiBoolFlag`
+
+**Positional Arguments:**
+- `StringPosArg`, `IntPosArg`, `BoolPosArg`
+- `StringVarLenArg`, `IntVarLenArg` (Variadic arguments, must be at the end)
+
+## Verifier (WIP)
+
+Note that it is possible to incorrectly configure **Moon**. For example, one can mark a flag/argument as required, and also provide a default value for it at the same time, or provide the same short flag name for two different flags. This will not result in a compilation failure, but may lead to unintended effects.
+
+Scenarios like these can be avoided with the help of `verify()`. This function returns a slice of `error`s that provides all the incorrect configuration in the application (if any).
+
+The application can have a test function that runs this method and ensures that the resulting slice is empty. The test may be run in a CI/CD pipeline.
+
+## License
+
+MIT
