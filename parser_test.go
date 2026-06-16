@@ -10,8 +10,8 @@ func TestLongStringFlagParse(t *testing.T) {
 	var targetB string
 
 	c := Command{}
-	c.Flags().StringFlag(&targetA, "test-flag-a", "", "")
-	c.Flags().StringFlag(&targetB, "test-flag-b", "", "")
+	c.Flags().String(&targetA, "test-flag-a", "", "")
+	c.Flags().String(&targetB, "test-flag-b", "", "")
 
 	p := newParser(&c, []string{"app", "--test-flag-a", "target_value_1", "--test-flag-b", "target_value_2"})
 	p.parse()
@@ -34,8 +34,8 @@ func TestShortStringFlagParse(t *testing.T) {
 	var targetB string
 
 	c := Command{}
-	c.Flags().StringFlag(&targetA, "", "a", "")
-	c.Flags().StringFlag(&targetB, "", "b", "")
+	c.Flags().String(&targetA, "", "a", "")
+	c.Flags().String(&targetB, "", "b", "")
 
 	p := newParser(&c, []string{"app", "-a", "target_value_1", "-btarget_value_2"})
 	p.parse()
@@ -110,7 +110,7 @@ func TestMultiStringFlagParse(t *testing.T) {
 	var targetSlice []string
 
 	c := Command{}
-	c.Flags().MultiStringFlag(&targetSlice, "vla", "v", "")
+	c.Flags().MultiString(&targetSlice, "vla", "v", "")
 
 	p := newParser(&c, []string{"app", "--vla", "a", "-v", "b", "--vla", "c"})
 	p.parse()
@@ -125,7 +125,7 @@ func TestMultiBoolFlagParse(t *testing.T) {
 	var target int
 
 	c := Command{}
-	c.Flags().MultiBoolFlag(&target, "vla", "v", "")
+	c.Flags().MultiBool(&target, "vla", "v", "")
 
 	p := newParser(&c, []string{"app", "--vla", "-v", "--vla", "-v", "--vla"})
 	p.parse()
@@ -140,7 +140,7 @@ func TestStringFlagDefaultValueParse(t *testing.T) {
 	var targetA string
 
 	c := Command{}
-	c.Flags().StringFlag(&targetA, "test-flag", "", "", Default("target_value"))
+	c.Flags().String(&targetA, "test-flag", "", "", Default("target_value"))
 
 	p := newParser(&c, []string{"app"})
 	p.parse()
