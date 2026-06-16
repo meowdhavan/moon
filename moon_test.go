@@ -15,6 +15,9 @@ func TestHelpPrint(t *testing.T) {
 
 	NewMoon(c)
 
+	parser := newParser(c, []string{"app"})
+	parser.parse()
+
 	got := showHelp
 	want := false
 
@@ -22,7 +25,7 @@ func TestHelpPrint(t *testing.T) {
 		t.Errorf("Moon Help False Flag mismatch; got=%v, want=%v", got, want)
 	}
 
-	parser := newParser(c, []string{"app", "--help"})
+	parser = newParser(c, []string{"app", "--help"})
 	parser.parse()
 
 	got = showHelp
