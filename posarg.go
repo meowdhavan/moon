@@ -11,7 +11,7 @@ type posArgCollection struct {
 	optionalPosArgs []*PosArg
 }
 
-func (c *posArgCollection) String(target *string, name string, about string, options ...variableOption) {
+func (c *posArgCollection) String(target *string, name string, about string, properties ...variableProperty) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -29,7 +29,7 @@ func (c *posArgCollection) String(target *string, name string, about string, opt
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&posArg.Variable)
 	}
 
@@ -40,7 +40,7 @@ func (c *posArgCollection) String(target *string, name string, about string, opt
 	}
 }
 
-func (c *posArgCollection) Bool(target *bool, name string, about string, options ...variableOption) {
+func (c *posArgCollection) Bool(target *bool, name string, about string, properties ...variableProperty) {
 	*target = false
 
 	posArg := &PosArg{
@@ -60,7 +60,7 @@ func (c *posArgCollection) Bool(target *bool, name string, about string, options
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&posArg.Variable)
 	}
 
@@ -71,7 +71,7 @@ func (c *posArgCollection) Bool(target *bool, name string, about string, options
 	}
 }
 
-func (c *posArgCollection) Int(target *int, name string, about string, options ...variableOption) {
+func (c *posArgCollection) Int(target *int, name string, about string, properties ...variableProperty) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -89,7 +89,7 @@ func (c *posArgCollection) Int(target *int, name string, about string, options .
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&posArg.Variable)
 	}
 

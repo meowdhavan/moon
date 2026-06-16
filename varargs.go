@@ -10,7 +10,7 @@ type varArgs struct {
 	varArg *VarArgs
 }
 
-func (a *varArgs) String(target *[]string, name string, about string, options ...variableOption) {
+func (a *varArgs) String(target *[]string, name string, about string, properties ...variableProperty) {
 	*target = []string{}
 
 	v := &VarArgs{
@@ -30,14 +30,14 @@ func (a *varArgs) String(target *[]string, name string, about string, options ..
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&v.Variable)
 	}
 
 	a.varArg = v
 }
 
-func (a *varArgs) Int(target *[]int, name string, about string, options ...variableOption) {
+func (a *varArgs) Int(target *[]int, name string, about string, properties ...variableProperty) {
 	*target = []int{}
 
 	v := &VarArgs{
@@ -57,7 +57,7 @@ func (a *varArgs) Int(target *[]int, name string, about string, options ...varia
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&v.Variable)
 	}
 
