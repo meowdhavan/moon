@@ -10,6 +10,23 @@ type Moon struct {
 	Printer Printer
 }
 
+var showHelp bool
+
+func initializeRoot(rootCmd *Command) {
+	queue := []*Command{rootCmd}
+
+	for len(queue) > 0 {
+		cur := queue[0]
+		queue = queue[1:]
+
+		cur.Flags().Bool(&showHelp, "help", "h", "Show help message")
+
+		for _, sub := range cur.subcommands {
+			queue = append(queue, sub)
+		}
+	}
+}
+
 func NewMoon(rootCmd *Command) *Moon {
 	p := DefaultPrinter{
 		SuppressWarnings: false,
@@ -23,14 +40,12 @@ func NewMoon(rootCmd *Command) *Moon {
 		Printer: &p,
 	}
 
+	initializeRoot(rootCmd)
+
 	return m
 }
 
 func (m *Moon) Execute() {
-	showHelp := false
-
-	m.RootCmd.GlobalFlags().Bool(&showHelp, "help", "h", "Show help message") // TODO: Use local flag for help
-
 	p := newParser(m.RootCmd, os.Args)
 	p.parse()
 
