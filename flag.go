@@ -14,7 +14,7 @@ type flagCollection struct {
 	flags []*Flag
 }
 
-func (c *flagCollection) StringFlag(target *string, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) String(target *string, name string, shortName string, about string, properties ...variableProperty) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -34,14 +34,14 @@ func (c *flagCollection) StringFlag(target *string, name string, shortName strin
 		requiresVal: true,
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *flagCollection) MultiStringFlag(target *[]string, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) MultiString(target *[]string, name string, shortName string, about string, properties ...variableProperty) {
 	*target = []string{}
 
 	f := &Flag{
@@ -63,14 +63,14 @@ func (c *flagCollection) MultiStringFlag(target *[]string, name string, shortNam
 		requiresVal: true,
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *flagCollection) BoolFlag(target *bool, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) Bool(target *bool, name string, shortName string, about string, properties ...variableProperty) {
 	*target = false
 
 	f := &Flag{
@@ -91,14 +91,14 @@ func (c *flagCollection) BoolFlag(target *bool, name string, shortName string, a
 		shortName: shortName,
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *flagCollection) MultiBoolFlag(target *int, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) MultiBool(target *int, name string, shortName string, about string, properties ...variableProperty) {
 	*target = 0
 
 	f := &Flag{
@@ -122,14 +122,14 @@ func (c *flagCollection) MultiBoolFlag(target *int, name string, shortName strin
 		shortName: shortName,
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *flagCollection) IntFlag(target *int, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) Int(target *int, name string, shortName string, about string, properties ...variableProperty) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -149,14 +149,14 @@ func (c *flagCollection) IntFlag(target *int, name string, shortName string, abo
 		requiresVal: true,
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&f.Variable)
 	}
 
 	c.flags = append(c.flags, f)
 }
 
-func (c *flagCollection) MultiIntFlag(target *[]int, name string, shortName string, about string, options ...variableOption) {
+func (c *flagCollection) MultiInt(target *[]int, name string, shortName string, about string, properties ...variableProperty) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -176,7 +176,7 @@ func (c *flagCollection) MultiIntFlag(target *[]int, name string, shortName stri
 		requiresVal: true,
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&f.Variable)
 	}
 

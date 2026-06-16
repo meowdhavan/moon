@@ -6,11 +6,12 @@ type PosArg struct {
 	Variable
 }
 
-type VarLenArg struct {
-	Variable
+type posArgCollection struct {
+	requiredPosArgs []*PosArg
+	optionalPosArgs []*PosArg
 }
 
-func (c *Command) StringPosArg(target *string, name string, about string, options ...variableOption) {
+func (c *posArgCollection) String(target *string, name string, about string, properties ...variableProperty) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -28,7 +29,7 @@ func (c *Command) StringPosArg(target *string, name string, about string, option
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&posArg.Variable)
 	}
 
@@ -39,34 +40,7 @@ func (c *Command) StringPosArg(target *string, name string, about string, option
 	}
 }
 
-func (c *Command) StringVarLenArg(target *[]string, name string, about string, options ...variableOption) {
-	*target = []string{}
-
-	v := &VarLenArg{
-		Variable: Variable{
-			name:    name,
-			aliases: []string{},
-			about:   about,
-			setValue: func(s string) error {
-				v, err := converter.ToString(s)
-				if err != nil {
-					return err
-				}
-
-				*target = append(*target, v)
-				return nil
-			},
-		},
-	}
-
-	for _, opt := range options {
-		opt(&v.Variable)
-	}
-
-	c.varLenArg = v
-}
-
-func (c *Command) BoolPosArg(target *bool, name string, about string, options ...variableOption) {
+func (c *posArgCollection) Bool(target *bool, name string, about string, properties ...variableProperty) {
 	*target = false
 
 	posArg := &PosArg{
@@ -86,7 +60,7 @@ func (c *Command) BoolPosArg(target *bool, name string, about string, options ..
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&posArg.Variable)
 	}
 
@@ -97,7 +71,7 @@ func (c *Command) BoolPosArg(target *bool, name string, about string, options ..
 	}
 }
 
-func (c *Command) IntPosArg(target *int, name string, about string, options ...variableOption) {
+func (c *posArgCollection) Int(target *int, name string, about string, properties ...variableProperty) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -115,7 +89,7 @@ func (c *Command) IntPosArg(target *int, name string, about string, options ...v
 		},
 	}
 
-	for _, opt := range options {
+	for _, opt := range properties {
 		opt(&posArg.Variable)
 	}
 
@@ -124,31 +98,4 @@ func (c *Command) IntPosArg(target *int, name string, about string, options ...v
 	} else {
 		c.optionalPosArgs = append(c.optionalPosArgs, posArg)
 	}
-}
-
-func (c *Command) IntVarLenArg(target *[]int, name string, about string, options ...variableOption) {
-	*target = []int{}
-
-	v := &VarLenArg{
-		Variable: Variable{
-			name:    name,
-			aliases: []string{},
-			about:   about,
-			setValue: func(s string) error {
-				v, err := converter.ToInt(s)
-				if err != nil {
-					return err
-				}
-
-				*target = append(*target, v)
-				return nil
-			},
-		},
-	}
-
-	for _, opt := range options {
-		opt(&v.Variable)
-	}
-
-	c.varLenArg = v
 }

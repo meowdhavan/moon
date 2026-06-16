@@ -11,27 +11,27 @@ type Variable struct {
 	isValueSet bool
 }
 
-type variableOption func(*Variable)
+type variableProperty func(*Variable)
 
-func Alias(alias string) variableOption {
+func Alias(alias string) variableProperty {
 	return func(v *Variable) {
 		v.aliases = append(v.aliases, alias)
 	}
 }
 
-func Env(env string) variableOption {
+func Env(env string) variableProperty {
 	return func(v *Variable) {
 		v.env = &env
 	}
 }
 
-func Default(defaultVal string) variableOption {
+func Default(defaultVal string) variableProperty {
 	return func(v *Variable) {
 		v.defaultVal = &defaultVal
 	}
 }
 
-func Required() variableOption {
+func Required() variableProperty {
 	return func(v *Variable) {
 		v.isRequired = true
 	}
