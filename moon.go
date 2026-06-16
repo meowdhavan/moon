@@ -29,7 +29,7 @@ func NewMoon(rootCmd *Command) *Moon {
 func (m *Moon) Execute() {
 	showHelp := false
 
-	m.RootCmd.GlobalFlags().BoolFlag(&showHelp, "help", "h", "Show help message") // TODO: Use local flag for help
+	m.RootCmd.GlobalFlags().Bool(&showHelp, "help", "h", "Show help message") // TODO: Use local flag for help
 
 	p := newParser(m.RootCmd, os.Args)
 	p.parse()
