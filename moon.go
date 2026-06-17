@@ -72,7 +72,8 @@ func (m *Moon) Execute() {
 func (m *Moon) Validate() []error {
 	errs := []error{}
 
-	seen := map[*Command]struct{}{}
+	cmdSeen := map[*Command]struct{}{}
+	globalFlagSeen := map[string]struct{}{}
 
 	queue := []*Command{m.RootCmd}
 
@@ -80,14 +81,76 @@ func (m *Moon) Validate() []error {
 		cur := queue[0]
 		queue = queue[1:]
 
-		_, found := seen[cur]
+		_, found := cmdSeen[cur]
 		if found {
-			err := errors.New("Subcommand loop detected: " + cur.Name)
+			errMsg := fmt.Sprintf("Subcommand loop present: %v", cur)
+			err := errors.New(errMsg)
 			errs = append(errs, err)
+
 			continue
 		}
 
-		// Check Flags
+		cmdSeen[cur] = struct{}{}
+
+		// Check Global Flag
+
+		for _, f := range cur.globalFlags.flags {
+			names := []string{}
+
+			if f.name != "" {
+				names = append(names, "--"+f.name)
+			}
+
+			for _, alias := range f.aliases {
+				names = append(names, "--"+alias)
+			}
+
+			if f.shortName != "" {
+				names = append(names, "-"+f.shortName)
+			}
+
+			for _, name := range names {
+				_, found := globalFlagSeen[name]
+				if found {
+					errMsg := fmt.Sprintf("Conflicting global flag name present for command %v and flag %v: %s", cur, f, name)
+					err := errors.New(errMsg)
+					errs = append(errs, err)
+				}
+
+				globalFlagSeen[name] = struct{}{}
+			}
+		}
+
+		// Check Local Flags
+
+		localFlagSeen := map[string]struct{}{}
+
+		for _, f := range cur.localFlags.flags {
+			names := []string{}
+
+			if f.name != "" {
+				names = append(names, "--"+f.name)
+			}
+
+			for _, alias := range f.aliases {
+				names = append(names, "--"+alias)
+			}
+
+			if f.shortName != "" {
+				names = append(names, "-"+f.shortName)
+			}
+
+			for _, name := range names {
+				_, found := localFlagSeen[name]
+				if found {
+					errMsg := fmt.Sprintf("Conflicting local flag name present for command %v and flag %v: %s", cur, f, name)
+					err := errors.New(errMsg)
+					errs = append(errs, err)
+				}
+
+				localFlagSeen[name] = struct{}{}
+			}
+		}
 
 		// Check Subcommands
 
