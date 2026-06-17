@@ -11,6 +11,7 @@ type Moon struct {
 }
 
 var showHelp bool
+var showVersion bool
 
 func initializeRoot(rootCmd *Command) {
 	queue := []*Command{rootCmd}
@@ -19,7 +20,13 @@ func initializeRoot(rootCmd *Command) {
 		cur := queue[0]
 		queue = queue[1:]
 
-		cur.Flags().Bool(&showHelp, "help", "h", "Show help message")
+		if !cur.SuppressHelp {
+			cur.Flags().Bool(&showHelp, "help", "h", "Show help message")
+		}
+
+		if cur.Version != "" {
+			cur.Flags().Bool(&showVersion, "version", "v", "Show version")
+		}
 
 		for _, sub := range cur.subcommands {
 			queue = append(queue, sub)
@@ -50,6 +57,11 @@ func (m *Moon) Execute() {
 	p.parse()
 
 	cmd := p.currentCmd
+
+	if showVersion {
+		fmt.Print(m.Printer.printVersion(m.RootCmd))
+		os.Exit(0)
+	}
 
 	if !p.unrecognizedSubcommand && (showHelp || cmd.Run == nil) {
 		fmt.Print(m.Printer.printHelp(cmd))
