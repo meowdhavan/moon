@@ -69,6 +69,97 @@ func (m *Moon) Execute() {
 	cmd.Run()
 }
 
+func validateFlag(f *Flag) []error {
+	errs := []error{}
+
+	// TODO
+
+	return errs
+}
+
+func validatePosArg(p *PosArg) []error {
+	errs := []error{}
+
+	// TODO
+
+	return errs
+}
+
+func validateVarArgs(v *VarArgs) []error {
+	errs := []error{}
+	if v == nil {
+		return errs
+	}
+
+	// TODO
+
+	return errs
+}
+
+func getFlagNames(f *Flag) []string {
+	names := []string{}
+
+	if f.name != "" {
+		names = append(names, "--"+f.name)
+	}
+
+	for _, alias := range f.aliases {
+		names = append(names, "--"+alias)
+	}
+
+	if f.shortName != "" {
+		names = append(names, "-"+f.shortName)
+	}
+
+	return names
+}
+
+func validateCommand(c *Command) []error {
+	errs := []error{}
+
+	// Check Local Flags
+
+	localFlagSeen := map[string]struct{}{}
+
+	localFlagNames := []string{}
+	for _, f := range c.localFlags.flags {
+		localFlagNames = append(localFlagNames, getFlagNames(f)...)
+
+		for _, name := range localFlagNames {
+			_, found := localFlagSeen[name]
+			if found {
+				errMsg := fmt.Sprintf("Conflicting local flag name present for command %v: %s", c, name)
+				err := errors.New(errMsg)
+				errs = append(errs, err)
+			}
+
+			localFlagSeen[name] = struct{}{}
+		}
+
+		errs = append(errs, validateFlag(f)...)
+	}
+
+	posArgsPresent := len(c.posArgs.optionalPosArgs) > 0 || len(c.posArgs.requiredPosArgs) > 0 || c.varArgs.varArg != nil
+
+	if len(c.subcommands) > 0 && posArgsPresent {
+		errMsg := fmt.Sprintf("Command contains both subcommands and posArgs: %v", c)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
+	for _, p := range c.posArgs.optionalPosArgs {
+		errs = append(errs, validatePosArg(p)...)
+	}
+
+	for _, p := range c.posArgs.requiredPosArgs {
+		errs = append(errs, validatePosArg(p)...)
+	}
+
+	errs = append(errs, validateVarArgs(c.varArgs.varArg)...)
+
+	return errs
+}
+
 func (m *Moon) Validate() []error {
 	errs := []error{}
 
@@ -76,6 +167,8 @@ func (m *Moon) Validate() []error {
 	globalFlagSeen := map[string]struct{}{}
 
 	queue := []*Command{m.RootCmd}
+
+	globalFlagNames := []string{}
 
 	for len(queue) > 0 {
 		cur := queue[0]
@@ -92,67 +185,24 @@ func (m *Moon) Validate() []error {
 
 		cmdSeen[cur] = struct{}{}
 
-		// Check Global Flag
+		// Check Global Flags
 
 		for _, f := range cur.globalFlags.flags {
-			names := []string{}
-
-			if f.name != "" {
-				names = append(names, "--"+f.name)
-			}
-
-			for _, alias := range f.aliases {
-				names = append(names, "--"+alias)
-			}
-
-			if f.shortName != "" {
-				names = append(names, "-"+f.shortName)
-			}
-
-			for _, name := range names {
-				_, found := globalFlagSeen[name]
-				if found {
-					errMsg := fmt.Sprintf("Conflicting global flag name present for command %v and flag %v: %s", cur, f, name)
-					err := errors.New(errMsg)
-					errs = append(errs, err)
-				}
-
-				globalFlagSeen[name] = struct{}{}
-			}
+			globalFlagNames = append(globalFlagNames, getFlagNames(f)...)
 		}
 
-		// Check Local Flags
-
-		localFlagSeen := map[string]struct{}{}
-
-		for _, f := range cur.localFlags.flags {
-			names := []string{}
-
-			if f.name != "" {
-				names = append(names, "--"+f.name)
+		for _, name := range globalFlagNames {
+			_, found := globalFlagSeen[name]
+			if found {
+				errMsg := fmt.Sprintf("Conflicting global flag name present for command %v: %s", cur, name)
+				err := errors.New(errMsg)
+				errs = append(errs, err)
 			}
 
-			for _, alias := range f.aliases {
-				names = append(names, "--"+alias)
-			}
-
-			if f.shortName != "" {
-				names = append(names, "-"+f.shortName)
-			}
-
-			for _, name := range names {
-				_, found := localFlagSeen[name]
-				if found {
-					errMsg := fmt.Sprintf("Conflicting local flag name present for command %v and flag %v: %s", cur, f, name)
-					err := errors.New(errMsg)
-					errs = append(errs, err)
-				}
-
-				localFlagSeen[name] = struct{}{}
-			}
+			globalFlagSeen[name] = struct{}{}
 		}
 
-		// Check Subcommands
+		errs = append(errs, validateCommand(cur)...)
 
 		for _, sub := range cur.subcommands {
 			queue = append(queue, sub)
