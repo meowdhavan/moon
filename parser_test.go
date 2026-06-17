@@ -1,6 +1,7 @@
 package moon
 
 import (
+	"errors"
 	"slices"
 	"testing"
 )
@@ -188,5 +189,25 @@ func TestInvalidSubcommandParse(t *testing.T) {
 
 	if !p.unrecognizedSubcommand {
 		t.Errorf("p.unrecognizedSubcommand mismatch; got=%v, want %v", p.unrecognizedSubcommand, true)
+	}
+}
+
+func TestMissingPosArgParse(t *testing.T) {
+	var targetA string
+	var targetB string
+
+	c := Command{}
+	c.PosArgs().String(&targetA, "a", "", Required())
+	c.PosArgs().String(&targetB, "b", "", Required())
+
+	p := newParser(&c, []string{"app", "target_value_1"})
+	p.parse()
+
+	gotErrs := p.errors
+	wantErrs := []error{errors.New("Missing value for required argument: b")}
+
+	if len(gotErrs) != 1 && (len(gotErrs) > 0 && gotErrs[0].Error() != wantErrs[0].Error()) {
+		t.Logf("targetA=%v, targetB=%v\n", targetA, targetB)
+		t.Errorf("errs mismatch; got=%v, want %v", gotErrs, wantErrs)
 	}
 }

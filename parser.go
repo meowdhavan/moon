@@ -208,7 +208,7 @@ func (p *parser) parse() {
 			} else {
 				if p.requiredPosArgIdx < len(p.currentCmd.posArgs.requiredPosArgs) { // Required PosArg
 					a := p.currentCmd.posArgs.requiredPosArgs[p.requiredPosArgIdx]
-					err := a.setValue(token)
+					err := p.setValue(&a.Variable, token)
 					if err != nil {
 						p.errors = append(p.errors, err)
 					}
@@ -216,7 +216,7 @@ func (p *parser) parse() {
 					p.requiredPosArgIdx++
 				} else if p.optionalPosArgIdx < len(p.currentCmd.posArgs.optionalPosArgs) { // Optional PosArg
 					a := p.currentCmd.posArgs.optionalPosArgs[p.optionalPosArgIdx]
-					err := a.setValue(token)
+					err := p.setValue(&a.Variable, token)
 					if err != nil {
 						p.errors = append(p.errors, err)
 					}
@@ -229,7 +229,11 @@ func (p *parser) parse() {
 						p.warnings = append(p.warnings, warning)
 						continue
 					}
-					v.setValue(token)
+
+					err := p.setValue(&v.Variable, token)
+					if err != nil {
+						p.errors = append(p.errors, err)
+					}
 				}
 			}
 		}
@@ -242,6 +246,13 @@ func (p *parser) parse() {
 
 		if !f.isValueSet && f.isRequired {
 			err := errors.New("Missing value for required flag: " + f.name)
+			p.errors = append(p.errors, err)
+		}
+	}
+
+	for _, a := range p.currentCmd.posArgs.requiredPosArgs {
+		if !a.isValueSet {
+			err := errors.New("Missing value for required argument: " + a.name)
 			p.errors = append(p.errors, err)
 		}
 	}
