@@ -2,6 +2,9 @@ package moon
 
 import "github.com/meowdhavan/moon/converter"
 
+// PosArg represents a positional argument parsed from the command line.
+// There are two types of PorArg: required and optional.
+// The required PosArgs are always parsed first.
 type PosArg struct {
 	Variable
 }
@@ -11,6 +14,7 @@ type posArgCollection struct {
 	optionalPosArgs []*PosArg
 }
 
+// String adds a [PosArg] of type string.
 func (c *posArgCollection) String(target *string, name string, about string, properties ...variableProperty) {
 	posArg := &PosArg{
 		Variable: Variable{
@@ -40,6 +44,7 @@ func (c *posArgCollection) String(target *string, name string, about string, pro
 	}
 }
 
+// Bool adds a [PosArg] of type bool.
 func (c *posArgCollection) Bool(target *bool, name string, about string, properties ...variableProperty) {
 	*target = false
 
@@ -71,6 +76,7 @@ func (c *posArgCollection) Bool(target *bool, name string, about string, propert
 	}
 }
 
+// Int adds a [PosArg] of type int.
 func (c *posArgCollection) Int(target *int, name string, about string, properties ...variableProperty) {
 	posArg := &PosArg{
 		Variable: Variable{

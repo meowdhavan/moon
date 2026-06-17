@@ -8,14 +8,19 @@ import (
 	"text/tabwriter"
 )
 
+// Style represents an ANSI text styling option.
 type Style int
 
 const (
+	// StyleBold applies bold formatting.
 	StyleBold = iota
+	// StyleUnderline applies underline formatting.
 	StyleUnderline
+	// StyleUppercase converts text to uppercase.
 	StyleUppercase
 )
 
+// DefaultPrinter provides default terminal output formatting for commands and help menus.
 type DefaultPrinter struct {
 	SuppressWarnings bool
 	IndentLength     int
@@ -39,10 +44,12 @@ func formatText(s string, styles *[]Style) string {
 	return s
 }
 
+// Heading formats the given string using the HeadingStyle rules.
 func (p *DefaultPrinter) Heading(s string) string {
 	return formatText(s, &p.HeadingStyle)
 }
 
+// Focus formats the given string using the FocusStyle rules.
 func (p *DefaultPrinter) Focus(s string) string {
 	return formatText(s, &p.FocusStyle)
 }
