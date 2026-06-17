@@ -39,7 +39,7 @@ func (a *varArgs) String(target *[]string, name string, about string, properties
 	a.varArg = v
 }
 
-// Int ensures that the application accepts [Int] of type string.
+// Int ensures that the application accepts [VarArgs] of type int.
 func (a *varArgs) Int(target *[]int, name string, about string, properties ...variableProperty) {
 	*target = []int{}
 

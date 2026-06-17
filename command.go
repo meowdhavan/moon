@@ -1,7 +1,7 @@
 package moon
 
 // Command represents a command/subcommand in the application's CLI.
-// It can hold [Flag]s, [PosArg]s, [VarArgs], and other [Command]s.
+// It can hold [Flag], and either [PosArg], [VarArgs], or other [Command].
 type Command struct {
 	Name         string
 	Version      string
@@ -20,19 +20,19 @@ type Command struct {
 	parent *Command
 }
 
-// Flags returns a collection to define local [Flag]s.
+// Flags returns a collection to define local [Flag].
 // Local flags are only available on this specific command.
 func (c *Command) Flags() *flagCollection {
 	return &c.localFlags
 }
 
-// GlobalFlags returns a collection to define global [Flag]s.
+// GlobalFlags returns a collection to define global [Flag].
 // Global flags are available on this command and all of its subcommands.
 func (c *Command) GlobalFlags() *flagCollection {
 	return &c.globalFlags
 }
 
-// PosArgs returns a collection to define [PosArg]s for this command.
+// PosArgs returns a collection to define [PosArg] for this command.
 func (c *Command) PosArgs() *posArgCollection {
 	return &c.posArgs
 }
