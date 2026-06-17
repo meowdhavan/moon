@@ -1,11 +1,13 @@
 package moon
 
 type Command struct {
-	Name       string
-	Aliases    []string
-	AboutShort string
-	AboutLong  string
-	Run        func()
+	Name         string
+	Version      string
+	Aliases      []string
+	AboutShort   string
+	AboutLong    string
+	Run          func()
+	SuppressHelp bool
 
 	subcommands []*Command
 	localFlags  flagCollection

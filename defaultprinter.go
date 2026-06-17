@@ -95,6 +95,14 @@ func (p *DefaultPrinter) printWarnings(warnings *[]error) string {
 	return b.String()
 }
 
+func (p *DefaultPrinter) printVersion(c *Command) string {
+	if c.Version == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("%s %s", c.Name, c.Version)
+}
+
 func (p *DefaultPrinter) printHelp(c *Command) string {
 	var b strings.Builder
 
