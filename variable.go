@@ -15,14 +15,14 @@ type Variable struct {
 
 type variableProperty func(*Variable)
 
-// Alias adds an alias name to the variable.
+// Alias adds an alias name to the [Variable].
 func Alias(alias string) variableProperty {
 	return func(v *Variable) {
 		v.aliases = append(v.aliases, alias)
 	}
 }
 
-// Env specifies an environment variable as a fallback.
+// Env specifies an environment variable as a fallback to the [Variable].
 // If no flag is passed, the value in the provided
 // environment variable will be used if present.
 func Env(env string) variableProperty {
@@ -31,7 +31,7 @@ func Env(env string) variableProperty {
 	}
 }
 
-// Default specifies a default value if the variable is not provided.
+// Default specifies a default value if the [Variable] is not provided.
 // Due to current limitations, this value must be provided as a string.
 func Default(defaultVal string) variableProperty {
 	return func(v *Variable) {
@@ -39,7 +39,7 @@ func Default(defaultVal string) variableProperty {
 	}
 }
 
-// Required marks the variable as mandatory.
+// Required marks the [Variable] as mandatory.
 // If the value for this variable is not supplied and there
 // are no fallback values, an error will be reported.
 func Required() variableProperty {
