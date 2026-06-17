@@ -1,6 +1,7 @@
 package moon
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
@@ -69,23 +70,31 @@ func (m *Moon) Execute() {
 }
 
 func (m *Moon) Validate() []error {
-	errors := []error{}
+	errs := []error{}
 
-	commands := []*Command{m.RootCmd}
+	seen := map[*Command]struct{}{}
 
-	for len(commands) > 0 {
-		c := commands[0]
-		commands = commands[1:]
+	queue := []*Command{m.RootCmd}
 
-		// If c was seen before, add error
+	for len(queue) > 0 {
+		cur := queue[0]
+		queue = queue[1:]
+
+		_, found := seen[cur]
+		if found {
+			err := errors.New("Subcommand loop detected: " + cur.Name)
+			errs = append(errs, err)
+			continue
+		}
 
 		// Check Flags
+
 		// Check Subcommands
 
-		for _, sub := range c.subcommands {
-			commands = append(commands, sub)
+		for _, sub := range cur.subcommands {
+			queue = append(queue, sub)
 		}
 	}
 
-	return errors
+	return errs
 }
