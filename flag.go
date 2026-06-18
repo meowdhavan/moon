@@ -16,9 +16,8 @@ type flagCollection struct {
 	flags []*Flag
 }
 
-// String adds a [Flag] of type string.
-// It sets the target value on encountering the
-// flag when parsing the command-line arguments.
+// String adds a [Flag] of type string. It sets the target value on encountering the flag when
+// parsing the command-line arguments.
 //
 // Example:
 //
@@ -57,10 +56,9 @@ func (c *flagCollection) String(
 	c.flags = append(c.flags, f)
 }
 
-// MultiString adds a [Flag] of type string.
-// It appends a value to the target slice on encountering
-// the flag when parsing the command-line arguments.
-// This allows a flag to be specified multiple times.
+// MultiString adds a [Flag] of type string. It appends a value to the target slice on encountering
+// the flag when parsing the command-line arguments. This allows a flag to be specified multiple
+// times.
 //
 // Example:
 //
@@ -101,9 +99,8 @@ func (c *flagCollection) MultiString(
 	c.flags = append(c.flags, f)
 }
 
-// Bool adds a [Flag] of type bool.
-// It sets the target value to true on encountering
-// the flag when parsing the command-line arguments.
+// Bool adds a [Flag] of type bool. It sets the target value to true on encountering the flag when
+// parsing the command-line arguments.
 //
 // Example:
 //
@@ -143,10 +140,9 @@ func (c *flagCollection) Bool(
 	c.flags = append(c.flags, f)
 }
 
-// MultiBool adds a [Flag] of type bool.
-// It increments the target int by 1 on encountering
-// the flag when parsing the command-line arguments.
-// This allows for cumulative flags, like -vvv or --verbose -v -v.
+// MultiBool adds a [Flag] of type bool. It increments the target int by 1 on encountering the flag
+// when parsing the command-line arguments. This allows for cumulative flags, like `-vvv“ or
+// `--verbose -v -v`.
 //
 // Example:
 //
@@ -189,9 +185,8 @@ func (c *flagCollection) MultiBool(
 	c.flags = append(c.flags, f)
 }
 
-// Int adds a [Flag] of type int.
-// It sets the target value on encountering the
-// flag when parsing the command-line arguments.
+// Int adds a [Flag] of type int. It sets the target value on encountering the flag when parsing the
+// command-line arguments.
 //
 // Example:
 //
@@ -230,9 +225,8 @@ func (c *flagCollection) Int(
 	c.flags = append(c.flags, f)
 }
 
-// MultiInt adds a [Flag] of type int.
-// It appends a value to the target slice on encountering
-// the flag when parsing the command-line arguments.
+// MultiInt adds a [Flag] of type int. It appends a value to the target slice on encountering the
+// flag when parsing the command-line arguments.
 //
 // Example:
 //

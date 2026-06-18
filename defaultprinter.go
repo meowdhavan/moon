@@ -8,8 +8,8 @@ import (
 	"text/tabwriter"
 )
 
-// Style represents an ANSI text styling option.
-// It is used to customize the appearance of terminal output.
+// Style represents an ANSI text styling option. It is used to customize the appearance of terminal
+// output.
 type Style int
 
 const (
@@ -21,8 +21,8 @@ const (
 	StyleUppercase
 )
 
-// DefaultPrinter provides default terminal output formatting for commands and help menus.
-// You can customize its properties to change the style of the generated help text.
+// DefaultPrinter provides default terminal output formatting for commands and help menus. You can
+// customize its properties to change the style of the generated help text.
 type DefaultPrinter struct {
 	SuppressWarnings bool
 	IndentLength     int

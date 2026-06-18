@@ -1,8 +1,8 @@
 package moon
 
-// Variable represents an entity that can contain a value.
-// It is the common base for [Flag], [PosArg], and [VarArgs].
-// It holds metadata such as name, aliases, description, and fallback values.
+// Variable represents an entity that can contain a value. It is the common base for [Flag],
+// [PosArg], and [VarArgs]. It holds metadata such as name, aliases, description, and fallback
+// values.
 type Variable struct {
 	name       string
 	aliases    []string
@@ -27,9 +27,8 @@ func Alias(alias string) variableProperty {
 	}
 }
 
-// Env specifies an environment variable as a fallback to the [Variable].
-// If no flag is passed, the value in the provided
-// environment variable will be used if present.
+// Env specifies an environment variable as a fallback to the [Variable]. If no flag is passed, the
+// value in the provided environment variable will be used if present.
 //
 // Example:
 //
@@ -40,8 +39,8 @@ func Env(env string) variableProperty {
 	}
 }
 
-// Default specifies a default value if the [Variable] is not provided.
-// Due to current limitations, this value must be provided as a string.
+// Default specifies a default value if the [Variable] is not provided. Due to current limitations,
+// this value must be provided as a string.
 //
 // Example:
 //
@@ -52,9 +51,8 @@ func Default(defaultVal string) variableProperty {
 	}
 }
 
-// Required marks the [Variable] as mandatory.
-// If the value for this variable is not supplied and there
-// are no fallback values, an error will be reported.
+// Required marks the [Variable] as mandatory. If the value for this variable is not supplied and
+// there are no fallback values, an error will be reported.
 //
 // Example:
 //

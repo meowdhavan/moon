@@ -2,9 +2,8 @@ package moon
 
 import "github.com/meowdhavan/moon/converter"
 
-// PosArg represents a positional argument parsed from the command line.
-// There are two types of PorArg: required and optional.
-// The required PosArgs are always parsed first.
+// PosArg represents a positional argument parsed from the command line. There are two types of
+// PorArg: required and optional. The required PosArgs are always parsed first.
 type PosArg struct {
 	Variable
 }

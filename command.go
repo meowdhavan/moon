@@ -1,9 +1,8 @@
 package moon
 
-// Command represents a command or subcommand in the application's CLI.
-// It acts as the core building block for your CLI application. Each command
-// can hold its own set of flags ([Flag]), and either positional arguments
-// ([PosArg]), variadic arguments ([VarArgs]), or subcommands ([Command]).
+// Command represents a command or subcommand in the application's CLI. It acts as the core building
+// block for your CLI application. Each command can hold its own set of flags ([Flag]), and either
+// positional arguments ([PosArg]), variadic arguments ([VarArgs]), or subcommands ([Command]).
 //
 // Example:
 //
@@ -33,8 +32,8 @@ type Command struct {
 	parent *Command
 }
 
-// Flags returns a collection to define local flags ([Flag]).
-// Local flags are only available on this specific command.
+// Flags returns a collection to define local flags ([Flag]). Local flags are only available on this
+// specific command.
 //
 // Example:
 //
@@ -55,10 +54,9 @@ func (c *Command) GlobalFlags() *flagCollection {
 	return &c.globalFlags
 }
 
-// PosArgs returns a collection to define positional arguments ([PosArg])
-// for this command. Positional arguments are parsed in the order they are
-// defined. However, the required ones are always parsed before the optional
-// ones, regardless of their order of definition.
+// PosArgs returns a collection to define positional arguments ([PosArg]) for this command.
+// Positional arguments are parsed in the order they are defined. However, the required ones are
+// always parsed before the optional ones, regardless of their order of definition.
 //
 // Example:
 //
@@ -68,13 +66,11 @@ func (c *Command) PosArgs() *posArgCollection {
 	return &c.posArgs
 }
 
-// VarArgs returns a collection to define variadic arguments ([VarArgs])
-// for this command. Variadic arguments capture all remaining positional
-// arguments provided.
+// VarArgs returns a collection to define variadic arguments ([VarArgs]) for this command. Variadic
+// arguments capture all remaining positional arguments provided.
 //
-// If a command has variadic arguments, it must not have subcommands ([Command])
-// or optional positional arguments ([PosArg]). Required positional arguments
-// are allowed.
+// If a command has variadic arguments, it must not have subcommands ([Command]) or optional
+// positional arguments ([PosArg]). Required positional arguments are allowed.
 //
 // Example:
 //
@@ -86,8 +82,8 @@ func (c *Command) VarArgs() *varArgs {
 
 // Subcommand adds a subcommand to this command.
 //
-// If a command has subcommands, it must not have positional arguments ([PosArg])
-// or variadic arguments ([VarArgs]).
+// If a command has subcommands, it must not have positional arguments ([PosArg]) or variadic
+// arguments ([VarArgs]).
 //
 // Example:
 //

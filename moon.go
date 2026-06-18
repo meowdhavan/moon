@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-// Moon is the main application struct that manages the root command and printing.
-// It serves as the entry point for executing the application.
+// Moon is the main application struct that manages the root command and printing. It serves as the
+// entry point for executing the application.
 type Moon struct {
 	RootCmd *Command
 	Printer Printer
@@ -62,10 +62,10 @@ func NewMoon(rootCmd *Command) *Moon {
 	return m
 }
 
-// Execute parses the command-line arguments and runs the appropriate command.
-// It handles help, version output, parsing errors, and command execution.
-// In the case there are errors during parsing, they will be printed out
-// along with the usage instructions, and the application will be halted.
+// Execute parses the command-line arguments and runs the appropriate command. It handles help,
+// version output, parsing errors, and command execution. In the case there are errors during
+// parsing, they will be printed out along with the usage instructions, and the application will be
+// halted.
 func (m *Moon) Execute() {
 	p := newParser(m.RootCmd, os.Args)
 	p.parse()
