@@ -24,7 +24,13 @@ type flagCollection struct {
 //
 //	var name string
 //	cmd.Flags().String(&name, "name", "n", "Your name", properties...)
-func (c *flagCollection) String(target *string, name string, shortName string, about string, properties ...variableProperty) {
+func (c *flagCollection) String(
+	target *string,
+	name string,
+	shortName string,
+	about string,
+	properties ...variableProperty,
+) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -60,7 +66,13 @@ func (c *flagCollection) String(target *string, name string, shortName string, a
 //
 //	var files []string
 //	cmd.Flags().MultiString(&files, "file", "f", "File to process", properties...)
-func (c *flagCollection) MultiString(target *[]string, name string, shortName string, about string, properties ...variableProperty) {
+func (c *flagCollection) MultiString(
+	target *[]string,
+	name string,
+	shortName string,
+	about string,
+	properties ...variableProperty,
+) {
 	*target = []string{}
 
 	f := &Flag{
@@ -97,7 +109,13 @@ func (c *flagCollection) MultiString(target *[]string, name string, shortName st
 //
 //	var verbose bool
 //	cmd.Flags().Bool(&verbose, "verbose", "v", "Enable verbose output", properties...)
-func (c *flagCollection) Bool(target *bool, name string, shortName string, about string, properties ...variableProperty) {
+func (c *flagCollection) Bool(
+	target *bool,
+	name string,
+	shortName string,
+	about string,
+	properties ...variableProperty,
+) {
 	*target = false
 
 	f := &Flag{
@@ -134,7 +152,13 @@ func (c *flagCollection) Bool(target *bool, name string, shortName string, about
 //
 //	var verbosity int
 //	cmd.Flags().MultiBool(&verbosity, "verbose", "v", "Verbosity level", properties...)
-func (c *flagCollection) MultiBool(target *int, name string, shortName string, about string, properties ...variableProperty) {
+func (c *flagCollection) MultiBool(
+	target *int,
+	name string,
+	shortName string,
+	about string,
+	properties ...variableProperty,
+) {
 	*target = 0
 
 	f := &Flag{
@@ -173,7 +197,13 @@ func (c *flagCollection) MultiBool(target *int, name string, shortName string, a
 //
 //	var port int
 //	cmd.Flags().Int(&port, "port", "p", "Port to listen on", properties...)
-func (c *flagCollection) Int(target *int, name string, shortName string, about string, properties ...variableProperty) {
+func (c *flagCollection) Int(
+	target *int,
+	name string,
+	shortName string,
+	about string,
+	properties ...variableProperty,
+) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,
@@ -208,7 +238,13 @@ func (c *flagCollection) Int(target *int, name string, shortName string, about s
 //
 //	var ports []int
 //	cmd.Flags().MultiInt(&ports, "port", "p", "Ports to bind", properties...)
-func (c *flagCollection) MultiInt(target *[]int, name string, shortName string, about string, properties ...variableProperty) {
+func (c *flagCollection) MultiInt(
+	target *[]int,
+	name string,
+	shortName string,
+	about string,
+	properties ...variableProperty,
+) {
 	f := &Flag{
 		Variable: Variable{
 			name:    name,

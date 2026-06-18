@@ -206,7 +206,9 @@ func (p *parser) parse() {
 				p.updateFlagMap()
 				p.fillSubcommandsMap()
 			} else {
-				if p.requiredPosArgIdx < len(p.currentCmd.posArgs.requiredPosArgs) { // Required PosArg
+				if p.requiredPosArgIdx < len(
+					p.currentCmd.posArgs.requiredPosArgs,
+				) { // Required PosArg
 					a := p.currentCmd.posArgs.requiredPosArgs[p.requiredPosArgIdx]
 					err := p.setValue(&a.Variable, token)
 					if err != nil {
@@ -214,7 +216,9 @@ func (p *parser) parse() {
 					}
 
 					p.requiredPosArgIdx++
-				} else if p.optionalPosArgIdx < len(p.currentCmd.posArgs.optionalPosArgs) { // Optional PosArg
+				} else if p.optionalPosArgIdx < len(
+					p.currentCmd.posArgs.optionalPosArgs,
+				) { // Optional PosArg
 					a := p.currentCmd.posArgs.optionalPosArgs[p.optionalPosArgIdx]
 					err := p.setValue(&a.Variable, token)
 					if err != nil {

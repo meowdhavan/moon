@@ -20,7 +20,12 @@ type posArgCollection struct {
 //
 //	var source string
 //	cmd.PosArgs().String(&source, "source", "Source directory", properties...)
-func (c *posArgCollection) String(target *string, name string, about string, properties ...variableProperty) {
+func (c *posArgCollection) String(
+	target *string,
+	name string,
+	about string,
+	properties ...variableProperty,
+) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,
@@ -55,7 +60,12 @@ func (c *posArgCollection) String(target *string, name string, about string, pro
 //
 //	var apply bool
 //	cmd.PosArgs().Bool(&apply, "apply", "Apply changes", properties...)
-func (c *posArgCollection) Bool(target *bool, name string, about string, properties ...variableProperty) {
+func (c *posArgCollection) Bool(
+	target *bool,
+	name string,
+	about string,
+	properties ...variableProperty,
+) {
 	*target = false
 
 	posArg := &PosArg{
@@ -92,7 +102,12 @@ func (c *posArgCollection) Bool(target *bool, name string, about string, propert
 //
 //	var count int
 //	cmd.PosArgs().Int(&count, "count", "Number of items", properties...)
-func (c *posArgCollection) Int(target *int, name string, about string, properties ...variableProperty) {
+func (c *posArgCollection) Int(
+	target *int,
+	name string,
+	about string,
+	properties ...variableProperty,
+) {
 	posArg := &PosArg{
 		Variable: Variable{
 			name:    name,

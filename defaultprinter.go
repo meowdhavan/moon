@@ -92,7 +92,9 @@ func (p *DefaultPrinter) printWarnings(warnings *[]error) string {
 	if len(*warnings) == 1 {
 		b.WriteString(fmt.Sprintf("%s\n", p.Heading("Warning:")))
 	} else {
-		b.WriteString(fmt.Sprintf("%s\n", p.Heading("Warnings ("+strconv.Itoa(len(*warnings))+"):")))
+		b.WriteString(
+			fmt.Sprintf("%s\n", p.Heading("Warnings ("+strconv.Itoa(len(*warnings))+"):")),
+		)
 	}
 
 	for _, e := range *warnings {
@@ -253,7 +255,12 @@ func (p *DefaultPrinter) printSubcommands(c *Command) string {
 	return b.String()
 }
 
-func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag, initialIndent bool, splitHelperLines bool) {
+func (p *DefaultPrinter) printFlagLine(
+	tw *tabwriter.Writer,
+	f *Flag,
+	initialIndent bool,
+	splitHelperLines bool,
+) {
 	fmt.Fprint(tw, p.getIndent())
 
 	if f.shortName != "" {

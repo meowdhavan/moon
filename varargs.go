@@ -17,7 +17,12 @@ type varArgs struct {
 //
 //	var targets []string
 //	cmd.VarArgs().String(&targets, "targets", "Target directories", properties...)
-func (a *varArgs) String(target *[]string, name string, about string, properties ...variableProperty) {
+func (a *varArgs) String(
+	target *[]string,
+	name string,
+	about string,
+	properties ...variableProperty,
+) {
 	*target = []string{}
 
 	v := &VarArgs{
