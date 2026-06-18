@@ -9,18 +9,20 @@ import (
 )
 
 // Style represents an ANSI text styling option.
+// It is used to customize the appearance of terminal output.
 type Style int
 
 const (
-	// StyleBold applies bold formatting.
+	// StyleBold is a [Style] applies bold formatting.
 	StyleBold = iota
-	// StyleUnderline applies underline formatting.
+	// StyleUnderline is a [Style] applies underline formatting.
 	StyleUnderline
-	// StyleUppercase converts text to uppercase.
+	// StyleUppercase is a [Style] converts text to uppercase.
 	StyleUppercase
 )
 
 // DefaultPrinter provides default terminal output formatting for commands and help menus.
+// You can customize its properties to change the style of the generated help text.
 type DefaultPrinter struct {
 	SuppressWarnings bool
 	IndentLength     int

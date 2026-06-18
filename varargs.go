@@ -12,6 +12,11 @@ type varArgs struct {
 }
 
 // String ensures that the application accepts [VarArgs] of type string.
+//
+// Example:
+//
+//	var targets []string
+//	cmd.VarArgs().String(&targets, "targets", "Target directories", properties...)
 func (a *varArgs) String(target *[]string, name string, about string, properties ...variableProperty) {
 	*target = []string{}
 
@@ -40,6 +45,11 @@ func (a *varArgs) String(target *[]string, name string, about string, properties
 }
 
 // Int ensures that the application accepts [VarArgs] of type int.
+//
+// Example:
+//
+//	var ids []int
+//	cmd.VarArgs().Int(&ids, "ids", "List of IDs", properties...)
 func (a *varArgs) Int(target *[]int, name string, about string, properties ...variableProperty) {
 	*target = []int{}
 
