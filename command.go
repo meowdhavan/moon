@@ -58,6 +58,10 @@ func (c *Command) GlobalFlags() *flagCollection {
 // Positional arguments are parsed in the order they are defined. However, the required ones are
 // always parsed before the optional ones, regardless of their order of definition.
 //
+// If a command has positional arguments ([PosArg]), it should not have subcommands ([Command]). If
+// a command has optional positional arguments, it should not have variadic arguments ([VarArgs]).
+// Variadic positional arguments are allowed with required positional arguments.
+//
 // Example:
 //
 //	var input string
@@ -69,7 +73,7 @@ func (c *Command) PosArgs() *posArgCollection {
 // VarArgs returns a collection to define variadic arguments ([VarArgs]) for this command. Variadic
 // arguments capture all remaining positional arguments provided.
 //
-// If a command has variadic arguments, it must not have subcommands ([Command]) or optional
+// If a command has variadic arguments, it should not have subcommands ([Command]) or optional
 // positional arguments ([PosArg]). Required positional arguments are allowed.
 //
 // Example:
@@ -82,7 +86,7 @@ func (c *Command) VarArgs() *varArgs {
 
 // Subcommand adds a subcommand to this command.
 //
-// If a command has subcommands, it must not have positional arguments ([PosArg]) or variadic
+// If a command has subcommands, it should not have positional arguments ([PosArg]) or variadic
 // arguments ([VarArgs]).
 //
 // Example:

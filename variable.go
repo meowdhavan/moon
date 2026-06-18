@@ -18,6 +18,9 @@ type variableProperty func(*Variable)
 
 // Alias adds an alias name to the [Variable].
 //
+// Aliases must not be present in positional arguments ([PosArg]) or variadic arguments ([VarArgs]).
+// Is is only meant to be used on flags ([Flag]).
+//
 // Example:
 //
 //	cmd.Flags().String(&name, "name", "n", "Your name", moon.Alias("first-name"))
@@ -42,6 +45,8 @@ func Env(env string) variableProperty {
 // Default specifies a default value if the [Variable] is not provided. Due to current limitations,
 // this value must be provided as a string.
 //
+// If a [Variable] has a Default value, it should not be [Required].
+//
 // Example:
 //
 //	cmd.Flags().Int(&port, "port", "p", "Port to listen on", moon.Default("8080"))
@@ -53,6 +58,8 @@ func Default(defaultVal string) variableProperty {
 
 // Required marks the [Variable] as mandatory. If the value for this variable is not supplied and
 // there are no fallback values, an error will be reported.
+//
+// If a [Variable] is Required, it should not have a [Default] value.
 //
 // Example:
 //
