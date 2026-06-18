@@ -8,14 +8,21 @@ import (
 	"text/tabwriter"
 )
 
+// Style represents an ANSI text styling option. It is used to customize the appearance of terminal
+// output.
 type Style int
 
 const (
+	// StyleBold is a [Style] applies bold formatting.
 	StyleBold = iota
+	// StyleUnderline is a [Style] applies underline formatting.
 	StyleUnderline
+	// StyleUppercase is a [Style] converts text to uppercase.
 	StyleUppercase
 )
 
+// DefaultPrinter provides default terminal output formatting for commands and help menus. You can
+// customize its properties to change the style of the generated help text.
 type DefaultPrinter struct {
 	SuppressWarnings bool
 	IndentLength     int
@@ -39,10 +46,12 @@ func formatText(s string, styles *[]Style) string {
 	return s
 }
 
+// Heading formats the given string using the HeadingStyle rules.
 func (p *DefaultPrinter) Heading(s string) string {
 	return formatText(s, &p.HeadingStyle)
 }
 
+// Focus formats the given string using the FocusStyle rules.
 func (p *DefaultPrinter) Focus(s string) string {
 	return formatText(s, &p.FocusStyle)
 }
@@ -83,7 +92,9 @@ func (p *DefaultPrinter) printWarnings(warnings *[]error) string {
 	if len(*warnings) == 1 {
 		b.WriteString(fmt.Sprintf("%s\n", p.Heading("Warning:")))
 	} else {
-		b.WriteString(fmt.Sprintf("%s\n", p.Heading("Warnings ("+strconv.Itoa(len(*warnings))+"):")))
+		b.WriteString(
+			fmt.Sprintf("%s\n", p.Heading("Warnings ("+strconv.Itoa(len(*warnings))+"):")),
+		)
 	}
 
 	for _, e := range *warnings {
@@ -244,7 +255,12 @@ func (p *DefaultPrinter) printSubcommands(c *Command) string {
 	return b.String()
 }
 
-func (p *DefaultPrinter) printFlagLine(tw *tabwriter.Writer, f *Flag, initialIndent bool, splitHelperLines bool) {
+func (p *DefaultPrinter) printFlagLine(
+	tw *tabwriter.Writer,
+	f *Flag,
+	initialIndent bool,
+	splitHelperLines bool,
+) {
 	fmt.Fprint(tw, p.getIndent())
 
 	if f.shortName != "" {

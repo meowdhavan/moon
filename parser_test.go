@@ -14,7 +14,10 @@ func TestLongStringFlagParse(t *testing.T) {
 	c.Flags().String(&targetA, "test-flag-a", "", "")
 	c.Flags().String(&targetB, "test-flag-b", "", "")
 
-	p := newParser(&c, []string{"app", "--test-flag-a", "target_value_1", "--test-flag-b", "target_value_2"})
+	p := newParser(
+		&c,
+		[]string{"app", "--test-flag-a", "target_value_1", "--test-flag-b", "target_value_2"},
+	)
 	p.parse()
 
 	var wantString string
@@ -188,7 +191,11 @@ func TestInvalidSubcommandParse(t *testing.T) {
 	}
 
 	if !p.unrecognizedSubcommand {
-		t.Errorf("p.unrecognizedSubcommand mismatch; got=%v, want %v", p.unrecognizedSubcommand, true)
+		t.Errorf(
+			"p.unrecognizedSubcommand mismatch; got=%v, want %v",
+			p.unrecognizedSubcommand,
+			true,
+		)
 	}
 }
 
