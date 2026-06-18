@@ -131,7 +131,7 @@ Flags and arguments in **Moon** are strongly typed. The following configurations
 - **Variadic Arguments** (`VarArgs()`):
   - `String`, `Int` (Captures all trailing arguments, must be at the end)
 
-## Verifier (WIP)
+## Validator (WIP)
 
 Note that it is possible to incorrectly configure **Moon**. For example,
 
@@ -143,7 +143,7 @@ Note that it is possible to incorrectly configure **Moon**. For example,
 
 Since this is not checked during compile time, this will not result in a compilation failure. However, this may lead to unintended effects.
 
-Scenarios like these can be avoided with the help of `Verify()`. This function returns a slice of `error`s that provides all incorrect configurations in the application (if there are any, that is).
+Scenarios like these can be avoided with the help of `Validate()`. This function returns a slice of `error`s that provides all incorrect configurations in the application (if there are any, that is).
 
 The application can have a test function that runs this method and ensures that the resulting slice is empty. The test may be run in a CI/CD pipeline.
 
