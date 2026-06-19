@@ -81,7 +81,17 @@ func validateVarArgs(v *VarArgs, c *Command) []error {
 		return errs
 	}
 
-	// TODO
+	if len(v.aliases) > 0 {
+		errMsg := fmt.Sprintf("VarArgs contains an alias for command %s: %s", c.Name, v.name)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
+	if v.isRequired {
+		errMsg := fmt.Sprintf("VarArgs marked required for command %s: %s", c.Name, v.name)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
 
 	return errs
 }
