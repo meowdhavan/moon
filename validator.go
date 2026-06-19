@@ -10,13 +10,13 @@ func validateFlag(f *Flag, c *Command) []error {
 
 	if f.requiresVal {
 		if f.defaultVal != nil {
-			errMsg := fmt.Sprintf("Boolean Flag has a default value for command %v: %v", c.Name, f)
+			errMsg := fmt.Sprintf("Boolean Flag has a default value for command %s: %s", c.Name, f.name)
 			err := errors.New(errMsg)
 			errs = append(errs, err)
 		}
 
 		if f.isRequired {
-			errMsg := fmt.Sprintf("Boolean Flag marked required for command %v: %v", c.Name, f)
+			errMsg := fmt.Sprintf("Boolean Flag marked required for command %s: %s", c.Name, f.name)
 			err := errors.New(errMsg)
 			errs = append(errs, err)
 		}
@@ -25,7 +25,7 @@ func validateFlag(f *Flag, c *Command) []error {
 	}
 
 	if f.defaultVal != nil && f.isRequired {
-		errMsg := fmt.Sprintf("Flag marked required and has a default value for command %v: %v", c.Name, f)
+		errMsg := fmt.Sprintf("Flag marked required and has a default value for command %s: %s", c.Name, f.name)
 		err := errors.New(errMsg)
 		errs = append(errs, err)
 	}
@@ -33,7 +33,7 @@ func validateFlag(f *Flag, c *Command) []error {
 	if f.defaultVal != nil {
 		err := f.setValue(*f.defaultVal)
 		if err != nil {
-			errMsg := fmt.Sprintf("Flag does not have a valid default value for command %v: %v", c.Name, f)
+			errMsg := fmt.Sprintf("Flag does not have a valid default value for command %s: %s", c.Name, f.name)
 			err := errors.New(errMsg)
 			errs = append(errs, err)
 		}
@@ -42,15 +42,40 @@ func validateFlag(f *Flag, c *Command) []error {
 	return errs
 }
 
-func validatePosArg(p *PosArg) []error {
+func validatePosArg(p *PosArg, c *Command) []error {
 	errs := []error{}
 
-	// TODO
+	if len(p.aliases) > 0 {
+		errMsg := fmt.Sprintf("PosArg contains an alias for command %s: %s", c.Name, p.name)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
+	if p.defaultVal != nil && p.isRequired {
+		errMsg := fmt.Sprintf("PosArg marked required and has a default value for command %s: %s", c.Name, p.name)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
+	if p.env != nil && p.isRequired {
+		errMsg := fmt.Sprintf("PosArg marked required and has an env fallback for command %s: %s", c.Name, p.name)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
+	if p.defaultVal != nil {
+		err := p.setValue(*p.defaultVal)
+		if err != nil {
+			errMsg := fmt.Sprintf("PosArg does not have a valid default value for command %s: %s", c.Name, p.name)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
+		}
+	}
 
 	return errs
 }
 
-func validateVarArgs(v *VarArgs) []error {
+func validateVarArgs(v *VarArgs, c *Command) []error {
 	errs := []error{}
 	if v == nil {
 		return errs
@@ -129,14 +154,14 @@ func validateCommand(c *Command, globalFlagsSeen map[string]struct{}) []error {
 	}
 
 	for _, p := range c.posArgs.optionalPosArgs {
-		errs = append(errs, validatePosArg(p)...)
+		errs = append(errs, validatePosArg(p, c)...)
 	}
 
 	for _, p := range c.posArgs.requiredPosArgs {
-		errs = append(errs, validatePosArg(p)...)
+		errs = append(errs, validatePosArg(p, c)...)
 	}
 
-	errs = append(errs, validateVarArgs(c.varArgs.varArg)...)
+	errs = append(errs, validateVarArgs(c.varArgs.varArg, c)...)
 
 	return errs
 }
