@@ -50,7 +50,7 @@ func getFlagNames(f *Flag) []string {
 	return names
 }
 
-func validateCommand(c *Command) []error {
+func validateCommand(c *Command, globalFlagsSeen map[string]struct{}) []error {
 	errs := []error{}
 
 	// Check Local Flags
@@ -65,6 +65,13 @@ func validateCommand(c *Command) []error {
 			_, found := localFlagSeen[name]
 			if found {
 				errMsg := fmt.Sprintf("Conflicting local flag name present for command %v: %s", c, name)
+				err := errors.New(errMsg)
+				errs = append(errs, err)
+			}
+
+			_, found = globalFlagsSeen[name]
+			if found {
+				errMsg := fmt.Sprintf("Conflicting flag name with global flag present for command %v: %s", c, name)
 				err := errors.New(errMsg)
 				errs = append(errs, err)
 			}
@@ -138,7 +145,7 @@ func (m *Moon) Validate() []error {
 			globalFlagSeen[name] = struct{}{}
 		}
 
-		errs = append(errs, validateCommand(cur)...)
+		errs = append(errs, validateCommand(cur, globalFlagSeen)...)
 
 		for _, sub := range cur.subcommands {
 			queue = append(queue, sub)
