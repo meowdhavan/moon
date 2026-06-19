@@ -5,10 +5,39 @@ import (
 	"fmt"
 )
 
-func validateFlag(f *Flag) []error {
+func validateFlag(f *Flag, c *Command) []error {
 	errs := []error{}
 
-	// TODO
+	if f.requiresVal {
+		if f.defaultVal != nil {
+			errMsg := fmt.Sprintf("Boolean Flag has a default value for command %v: %v", c.Name, f)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
+		}
+
+		if f.isRequired {
+			errMsg := fmt.Sprintf("Boolean Flag marked required for command %v: %v", c.Name, f)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
+		}
+
+		return errs
+	}
+
+	if f.defaultVal != nil && f.isRequired {
+		errMsg := fmt.Sprintf("Flag marked required and has a default value for command %v: %v", c.Name, f)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
+	if f.defaultVal != nil {
+		err := f.setValue(*f.defaultVal)
+		if err != nil {
+			errMsg := fmt.Sprintf("Flag does not have a valid default value for command %v: %v", c.Name, f)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
+		}
+	}
 
 	return errs
 }
@@ -55,37 +84,40 @@ func validateCommand(c *Command, globalFlagsSeen map[string]struct{}) []error {
 
 	// Check Local Flags
 
-	localFlagSeen := map[string]struct{}{}
-
 	localFlagNames := []string{}
 	for _, f := range c.localFlags.flags {
 		localFlagNames = append(localFlagNames, getFlagNames(f)...)
+	}
 
-		for _, name := range localFlagNames {
-			_, found := localFlagSeen[name]
-			if found {
-				errMsg := fmt.Sprintf("Conflicting local flag name present for command %v: %s", c, name)
-				err := errors.New(errMsg)
-				errs = append(errs, err)
-			}
+	localFlagSeen := map[string]struct{}{}
+	for _, name := range localFlagNames {
+		// fmt.Printf("%s, ", name)
 
-			_, found = globalFlagsSeen[name]
-			if found {
-				errMsg := fmt.Sprintf("Conflicting flag name with global flag present for command %v: %s", c, name)
-				err := errors.New(errMsg)
-				errs = append(errs, err)
-			}
-
-			localFlagSeen[name] = struct{}{}
+		_, found := localFlagSeen[name]
+		if found {
+			errMsg := fmt.Sprintf("Conflicting local flag names present for command %v: %s", c.Name, name)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
 		}
 
-		errs = append(errs, validateFlag(f)...)
+		_, found = globalFlagsSeen[name]
+		if found {
+			errMsg := fmt.Sprintf("Conflicting local flag name with global flag present for command %v: %s", c.Name, name)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
+		}
+
+		localFlagSeen[name] = struct{}{}
+	}
+
+	for _, f := range c.localFlags.flags {
+		errs = append(errs, validateFlag(f, c)...)
 	}
 
 	posArgsPresent := len(c.posArgs.optionalPosArgs) > 0 || len(c.posArgs.requiredPosArgs) > 0 || c.varArgs.varArg != nil
 
 	if len(c.subcommands) > 0 && posArgsPresent {
-		errMsg := fmt.Sprintf("Command contains both subcommands and posArgs: %v", c)
+		errMsg := fmt.Sprintf("Command contains both subcommands and posArgs: %v", c.Name)
 		err := errors.New(errMsg)
 		errs = append(errs, err)
 	}
@@ -111,9 +143,9 @@ func (m *Moon) Validate() []error {
 
 	queue := []*Command{m.RootCmd}
 
-	globalFlagNames := []string{}
-
 	for len(queue) > 0 {
+		curGlobalFlagNames := []string{}
+
 		cur := queue[0]
 		queue = queue[1:]
 
@@ -131,13 +163,13 @@ func (m *Moon) Validate() []error {
 		// Check Global Flags
 
 		for _, f := range cur.globalFlags.flags {
-			globalFlagNames = append(globalFlagNames, getFlagNames(f)...)
+			curGlobalFlagNames = append(curGlobalFlagNames, getFlagNames(f)...)
 		}
 
-		for _, name := range globalFlagNames {
+		for _, name := range curGlobalFlagNames {
 			_, found := globalFlagSeen[name]
 			if found {
-				errMsg := fmt.Sprintf("Conflicting global flag name present for command %v: %s", cur, name)
+				errMsg := fmt.Sprintf("Conflicting global flag name present for command %v: %s", cur.Name, name)
 				err := errors.New(errMsg)
 				errs = append(errs, err)
 			}
