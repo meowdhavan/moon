@@ -243,7 +243,14 @@ func (p *parser) parse() {
 		}
 	}
 
+	flagSeen := map[*Flag]struct{}{}
+
 	for _, f := range p.flagMap {
+		_, seen := flagSeen[f]
+		if seen {
+			continue
+		}
+
 		if !f.isValueSet {
 			p.setFromFallbacks(&f.Variable)
 		}
@@ -252,6 +259,8 @@ func (p *parser) parse() {
 			err := errors.New("Missing value for required flag: " + f.name)
 			p.errors = append(p.errors, err)
 		}
+
+		flagSeen[f] = struct{}{}
 	}
 
 	for _, a := range p.currentCmd.posArgs.requiredPosArgs {
