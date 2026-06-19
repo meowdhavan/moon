@@ -226,7 +226,7 @@ func (p *parser) parse() {
 					}
 
 					p.optionalPosArgIdx++
-				} else { // VarLenArg
+				} else { // VarArgs
 					v := p.currentCmd.varArgs.varArg
 					if v == nil {
 						warning := errors.New("Unrecognized argument: " + token)
@@ -263,6 +263,11 @@ func (p *parser) parse() {
 
 	for _, a := range p.currentCmd.posArgs.optionalPosArgs[p.optionalPosArgIdx:] {
 		p.setFromFallbacks(&a.Variable)
+	}
+
+	v := p.currentCmd.varArgs.varArg
+	if v != nil && !v.isValueSet {
+		p.setFromFallbacks(&v.Variable)
 	}
 }
 

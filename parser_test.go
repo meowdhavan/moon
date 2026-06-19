@@ -213,7 +213,7 @@ func TestMissingPosArgParse(t *testing.T) {
 	gotErrs := p.errors
 	wantErrs := []error{errors.New("Missing value for required argument: b")}
 
-	if len(gotErrs) != 1 && (len(gotErrs) > 0 && gotErrs[0].Error() != wantErrs[0].Error()) {
+	if len(gotErrs) != 1 || gotErrs[0].Error() != wantErrs[0].Error() {
 		t.Logf("targetA=%v, targetB=%v\n", targetA, targetB)
 		t.Errorf("errs mismatch; got=%v, want %v", gotErrs, wantErrs)
 	}
