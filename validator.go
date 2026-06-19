@@ -93,6 +93,15 @@ func validateVarArgs(v *VarArgs, c *Command) []error {
 		errs = append(errs, err)
 	}
 
+	if v.defaultVal != nil {
+		err := v.setValue(*v.defaultVal)
+		if err != nil {
+			errMsg := fmt.Sprintf("VarArgs do not have a valid default value for command %s: %s", c.Name, v.name)
+			err := errors.New(errMsg)
+			errs = append(errs, err)
+		}
+	}
+
 	return errs
 }
 
