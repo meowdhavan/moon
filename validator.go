@@ -122,6 +122,12 @@ func validateCommand(c *Command, globalFlagsSeen map[string]struct{}) []error {
 		errs = append(errs, err)
 	}
 
+	if len(c.posArgs.optionalPosArgs) > 0 && c.varArgs.varArg != nil {
+		errMsg := fmt.Sprintf("Command contains both optional posArgs and varArgs: %v", c.Name)
+		err := errors.New(errMsg)
+		errs = append(errs, err)
+	}
+
 	for _, p := range c.posArgs.optionalPosArgs {
 		errs = append(errs, validatePosArg(p)...)
 	}
