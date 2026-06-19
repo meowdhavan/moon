@@ -266,7 +266,7 @@ func (p *parser) parse() {
 	}
 
 	v := p.currentCmd.varArgs.varArg
-	if !v.isValueSet {
+	if v != nil && !v.isValueSet {
 		p.setFromFallbacks(&v.Variable)
 	}
 }
