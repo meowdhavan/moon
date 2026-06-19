@@ -2,14 +2,13 @@
   <h1>Moon</h1>
 
   [![Docker Image CI](https://github.com/meowdhavan/moon/actions/workflows/go-test.yml/badge.svg)](https://github.com/meowdhavan/moon/actions)
-
 </div>
 
 A minimal POSIX-compliant command-line parser for Go. **Moon** lets you design CLI applications with support for flags, subcommands, positional arguments, and help generation.
 
 ## Installation
 
-**Moon** can be added to any Go project using the `go get` command.
+**Moon** can be added to any Go project using `go get`.
 
 ```bash
 go get github.com/meowdhavan/moon
@@ -17,7 +16,7 @@ go get github.com/meowdhavan/moon
 
 ## Usage
 
-**Moon** is inspired by Cobra, and many of their commands will look similar.
+**Moon** is very much inspired by Cobra, and many of their commands will look similar.
 
 ### Example
 
@@ -51,7 +50,7 @@ func init() {
 	RootCmd.Flags().String(&name, "name", "n", "Your name", moon.Env("GREET_NAME"), moon.Required())
 	RootCmd.Flags().Int(&age, "age", "a", "Your age", moon.Default("18"))
 
-	RootCmd.StringVarLenArg(&files, "files", "List of files to process")
+	RootCmd.VarArgs().String(&files, "files", "List of files to process")
 }
 ```
 
@@ -94,7 +93,7 @@ When defining flags or positional arguments, you can pass optional modifiers to 
 - `moon.Alias("alias_name")`: Sets an alias for the flag.
 - `moon.Env("ENV_VAR")`: Falls back to reading from an environment variable.
 - `moon.Default("value")`: Sets a default value if the flag is not provided. Due to current limitations, the provided value must be a `string`, irrespective of the type of the flag/argument.
-- `moon.Required()`: Marks the flag or argument as required. If no value is provided and no fallback is available, an error is thrown.
+- `moon.Required()`: Marks the flag or argument as required. If no value is provided and no fallback is available, an error is shown and the application is halted.
 
 ### Subcommands
 
@@ -120,22 +119,34 @@ func init() {
 
 ### Supported Types
 
-**Flags:**
-- `StringFlag`, `IntFlag`, `BoolFlag`
-- `MultiStringFlag`, `MultiIntFlag`, `MultiBoolFlag`
+Flags and arguments in **Moon** are strongly typed. The following configurations are currently supported:
 
-**Positional Arguments:**
-- `StringPosArg`, `IntPosArg`, `BoolPosArg`
-- `StringVarLenArg`, `IntVarLenArg` (Variadic arguments, must be at the end)
+- **Flags** (`Flags()` / `GlobalFlags()`):
+  - `String`, `Int`, `Bool`
+  - `MultiString`, `MultiInt`, `MultiBool` (e.g., `-vvv` or multiple `-f` declarations)
 
-## Verifier (WIP)
+- **Positional Arguments** (`PosArgs()`):
+  - `String`, `Int`, `Bool`
+  
+- **Variadic Arguments** (`VarArgs()`):
+  - `String`, `Int` (Captures all trailing arguments, must be at the end)
 
-Note that it is possible to incorrectly configure **Moon**. For example, one can mark a flag/argument as required, and also provide a default value for it at the same time, or provide the same short flag name for two different flags. This will not result in a compilation failure, but may lead to unintended effects.
+## Validator (WIP)
 
-Scenarios like these can be avoided with the help of `verify()`. This function returns a slice of `error`s that provides all the incorrect configuration in the application (if any).
+Note that it is possible to incorrectly configure **Moon**. For example,
+
+- Mark a flag/argument as required, as well as provide a default value for it.
+- Provide the same short flag name for two different flags.
+- Have a command as a subcommand of itself.
+- Provide positional arguments as well as subcommands to a command.
+- ...and much more!
+
+Since this is not checked during compile time, this will not result in a compilation failure. However, this may lead to unintended effects.
+
+Scenarios like these can be avoided with the help of `Validate()`. This function returns a slice of `error`s that provides all incorrect configurations in the application (if there are any, that is).
 
 The application can have a test function that runs this method and ensures that the resulting slice is empty. The test may be run in a CI/CD pipeline.
 
 ## License
 
-MIT
+This project is licensed under the MIT License.

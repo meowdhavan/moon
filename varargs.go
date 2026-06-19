@@ -2,6 +2,7 @@ package moon
 
 import "github.com/meowdhavan/moon/converter"
 
+// VarArgs represents the variadic arguments parsed from the command line.
 type VarArgs struct {
 	Variable
 }
@@ -10,7 +11,18 @@ type varArgs struct {
 	varArg *VarArgs
 }
 
-func (a *varArgs) String(target *[]string, name string, about string, properties ...variableProperty) {
+// String ensures that the application accepts [VarArgs] of type string.
+//
+// Example:
+//
+//	var targets []string
+//	cmd.VarArgs().String(&targets, "targets", "Target directories", properties...)
+func (a *varArgs) String(
+	target *[]string,
+	name string,
+	about string,
+	properties ...variableProperty,
+) {
 	*target = []string{}
 
 	v := &VarArgs{
@@ -37,6 +49,12 @@ func (a *varArgs) String(target *[]string, name string, about string, properties
 	a.varArg = v
 }
 
+// Int ensures that the application accepts [VarArgs] of type int.
+//
+// Example:
+//
+//	var ids []int
+//	cmd.VarArgs().Int(&ids, "ids", "List of IDs", properties...)
 func (a *varArgs) Int(target *[]int, name string, about string, properties ...variableProperty) {
 	*target = []int{}
 

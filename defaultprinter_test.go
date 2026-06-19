@@ -125,7 +125,8 @@ func TestLocalFlagsPrint(t *testing.T) {
 	localFlagCount := 2
 
 	for i := range localFlagCount {
-		rootCmd.Flags().String(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
+		rootCmd.Flags().
+			String(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
 	}
 
 	p := DefaultPrinter{
@@ -194,7 +195,8 @@ func TestGlobalFlagsPrint(t *testing.T) {
 	globalFlagCount := 3
 
 	for i := range globalFlagCount {
-		rootCmd.GlobalFlags().String(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
+		rootCmd.GlobalFlags().
+			String(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
 	}
 
 	p := DefaultPrinter{
@@ -232,13 +234,15 @@ func TestLocalAndGlobalFlagsPrint(t *testing.T) {
 	localFlagCount := 2
 
 	for i := range localFlagCount {
-		rootCmd.Flags().String(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
+		rootCmd.Flags().
+			String(nil, fmt.Sprintf("local-flag-%d", i+1), "t", fmt.Sprintf("Local Flag %d", i+1))
 	}
 
 	globalFlagCount := 3
 
 	for i := range globalFlagCount {
-		rootCmd.GlobalFlags().String(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
+		rootCmd.GlobalFlags().
+			String(nil, fmt.Sprintf("global-flag-%d", i+1), "t", fmt.Sprintf("Global Flag %d", i+1))
 	}
 
 	p := DefaultPrinter{
@@ -281,7 +285,8 @@ func TestFlagFallbackPrint(t *testing.T) {
 	rootCmd.Flags().String(nil, "test-flag-2", "b", "Test Flag 2", Env("TEST_ENV_VAR"))
 	rootCmd.Flags().String(nil, "test-flag-3", "c", "Test Flag 3", Env("TEST_ENV_VAR"), Required())
 	rootCmd.Flags().String(nil, "test-flag-4", "d", "Test Flag 4", Default("DEF"))
-	rootCmd.Flags().String(nil, "test-flag-5", "e", "Test Flag 5", Env("TEST_ENV_VAR"), Default("DEF"))
+	rootCmd.Flags().
+		String(nil, "test-flag-5", "e", "Test Flag 5", Env("TEST_ENV_VAR"), Default("DEF"))
 
 	p := DefaultPrinter{
 		SuppressWarnings: false,
